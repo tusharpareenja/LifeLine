@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import DarkModeToggle from "./Components/DarkMode";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +23,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className=" bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 ">
+        <DarkModeToggle />
         {children}
+        </div>
+
       </body>
     </html>
   );
