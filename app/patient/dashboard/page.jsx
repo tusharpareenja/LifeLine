@@ -8,7 +8,11 @@ import { Avatar, AvatarImage, avatarUrl, AvatarFallback } from '@/components/ui/
 import image from '../../../public/Images/profile_pic.jpg'
 import {  Droplet, User } from 'lucide-react'
 
+
 // Mock data
+
+
+
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
   { id: 2, doctor: 'Dr. Johnson', date: '2025-02-18', time: '2:30 PM' },
@@ -40,7 +44,12 @@ const user = {
   // In your JSX
 
 
+
+
 const WelcomeBanner = ({ user }) => (
+ 
+
+
 <Card className="bg-blue-50 border-blue-200  dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="w-16 h-16">
@@ -117,9 +126,25 @@ const EmergencyServices = () => (
       <CardTitle>Emergency Services</CardTitle>
     </CardHeader>
     <CardContent className="flex flex-col space-y-2">
-      <Button variant="destructive">911 Emergency</Button>
-      <Button>Book Ambulance</Button>
-      <Button>Find Blood Banks</Button>
+    <Button
+  variant="destructive"
+  onClick={() => window.location.href = "tel:112"}
+>
+  112 Emergency
+</Button>
+
+<Button
+  onClick={() => window.open("https://medulance.com/", "_blank")}
+>
+  Book Ambulance
+</Button>
+
+<Button
+  onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
+>
+  Find Blood Banks
+</Button>
+
     </CardContent>
   </Card>
 );
@@ -327,6 +352,8 @@ const AnalyticsReports = () => (
 
 const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
+
+  
 
   const sidebarItems = [
     { icon: Home, label: 'Dashboard' },

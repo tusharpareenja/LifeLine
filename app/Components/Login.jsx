@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
+import { Router } from "next/router"
+import { useRouter } from 'next/navigation'
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -23,6 +25,7 @@ const LoginForm = () => {
   }
   const handleGoogleLogin = async() => {
     await handleGoogleSignIn();
+    Router.push('/patient/dashboard')
   }
 
   return (
