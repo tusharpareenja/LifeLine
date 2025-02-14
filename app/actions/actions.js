@@ -1,8 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { db } from '@/lib/db'
-import { auth } from '@/lib/auth'
+import prisma from '../db/db'
+const db = prisma
 
 // Patient Actions
 export async function createPatient(data) {
@@ -63,6 +63,8 @@ export async function getPatient(id) {
     return { success: false, error: 'Failed to fetch patient' }
   }
 }
+
+
 
 // Hospital Actions
 export async function createHospital(data) {

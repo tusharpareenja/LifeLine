@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import DarkModeToggle from "./Components/DarkMode";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +24,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SessionProvider>
         <div className=" bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 ">
         <DarkModeToggle />
         {children}
         </div>
+        </SessionProvider>
 
       </body>
     </html>

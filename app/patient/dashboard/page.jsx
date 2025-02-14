@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Bell, Calendar, FileText, Home, LogOut, MessageSquare, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarImage, avatarUrl, AvatarFallback } from '@/components/ui/avatar';
 import image from '../../../public/Images/profile_pic.jpg'
 import {  Droplet, User } from 'lucide-react'
+import { getSession, useSession } from 'next-auth/react';
+import { getPatient } from '@/app/actions/actions';
 
 // Mock data
 const upcomingAppointments = [
@@ -45,7 +47,7 @@ const WelcomeBanner = ({ user }) => (
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="w-16 h-16">
           <AvatarImage src={user.avatarUrl} alt={user.name} />
-          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+          {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
         </Avatar>
         <div className="flex flex-col">
           <h2 className="text-2xl font-bold">{user.name}</h2>
@@ -327,77 +329,40 @@ const AnalyticsReports = () => (
 
 const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
+  const [patientdetails, setPatientDetails] = useState({});
+  const { data: session } = useSession(); // Assuming session contains user info
 
-  const sidebarItems = [
-    { icon: Home, label: 'Dashboard' },
-    { icon: Calendar, label: 'Appointments' },
-    { icon: FileText, label: 'Medical Records' },
-    { icon: MessageSquare, label: 'Doctor Consultation' },
-    { icon: Bell, label: 'Emergency Services' },
-    { icon: Settings, label: 'Profile Settings' },
-    { icon: LogOut, label: 'Logout' },
-  ];
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      console.log(session)
+      if (session && session.user.id) {
+        const patientData = await getPatient(session.user.patientId);
+        console.log(patientData)
+        setPatientDetails(patientData.data);
+      }
+    };
+    fetchPatientDetails();
+  }, [session]);
 
   return (
-    <div className="flex h-screen  bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-     
-
-      <main className="flex-1 p-8 ">
-        <div className="mb-4">
-          <label htmlFor="userType" className="mr-2  ">
-            Select User Type:
-          </label>
-          <select
-            id="userType"
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="border rounded p-1  bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-          >
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
-            <option value="admin">Hospital Admin</option>
-          </select>
-        </div>
-
-        {userType === 'patient' && (
-          <>
-            <WelcomeBanner user={user} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <UpcomingAppointments appointments={upcomingAppointments} />
-              <HospitalBedAvailability hospitals={hospitalBedAvailability} />
-              <EmergencyServices />
-              <DoctorRecommendations doctors={doctorRecommendations} />
-              <RecentMedicalReports reports={recentMedicalReports} />
-            </div>
-          </>
-        )}
-
-        {userType === 'doctor' && (
-          <>
-            <h2 className="text-2xl font-bold mb-6">Doctor Dashboard</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <AppointmentsOverview />
-              <PatientMedicalHistoryPreview />
-              <EmergencyRequestsWidget />
-              <VideoConsultationButton />
-            </div>
-          </>
-        )}
-
-        {userType === 'admin' && (
-          <>
-            <h2 className="text-2xl font-bold mb-6">Hospital Admin Dashboard</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <LiveBedOccupancyTracker />
-              <DoctorStaffManagement />
-              <EmergencyCasesPanel />
-              <AnalyticsReports />
-            </div>
-          </>
-        )}
-      </main>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <WelcomeBanner user={patientdetails} />
+      <UpcomingAppointments appointments={upcomingAppointments} />
+      <DoctorRecommendations doctors={doctorRecommendations} />
+      <HospitalBedAvailability hospitals={hospitalBedAvailability} />
+      <EmergencyServices />
+      <RecentMedicalReports reports={recentMedicalReports} />
+      <AppointmentsOverview />
+      <PatientMedicalHistoryPreview />
+      <EmergencyRequestsWidget />
+      <VideoConsultationButton />
+      <LiveBedOccupancyTracker />
+      <DoctorStaffManagement />
+      <EmergencyCasesPanel />
+      <AnalyticsReports />
     </div>
   );
 };
+
 
 export default Dashboard;
