@@ -46,7 +46,7 @@ const DarkModeToggle = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="fixed right-4 top-4 flex items-center justify-center p-2 bg-transparent border rounded-full z-10"
+      className="fixed right-4 top-4 flex items-center justify-center p-2 bg-transparent border rounded-full z-20"
     >
       {theme === "dark" ? (
         <Sun className="h-[1.5rem] w-[1.5rem] text-yellow-500 transition-transform duration-300" />
