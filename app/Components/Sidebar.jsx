@@ -54,7 +54,7 @@ const Sidebar = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   // Redirect to Appointments
-                  window.location.href = '/appointments'; // Example redirect
+                  window.location.href = '/patient/appointments'; // Example redirect
                   setIsOpen(false);
                 }}
               >

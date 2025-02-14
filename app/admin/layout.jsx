@@ -1,6 +1,6 @@
 "use client"
 
-import Sidebar from "../Components/Sidebar"
+import Sidebar from "./components/Sidebar"
 import { usePathname } from "next/navigation"
 
 const Layout = ({ children }) => {
