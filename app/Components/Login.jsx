@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
+import { signIn } from "next-auth/react"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -21,9 +22,9 @@ const LoginForm = () => {
     setError("Invalid credentials, please try again.")
     setLoading(false)
   }
-  const handleGoogleLogin = async() => {
-    await handleGoogleSignIn();
-  }
+  const handleGoogleLogin = async () => {
+    await signIn("google");
+  };  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">

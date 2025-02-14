@@ -1,0 +1,306 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String      @id @default(uuid())
+  name          String?
+  gid           String?
+  email         String?     @unique
+  emailVerified DateTime?
+  phone         String?     @unique @db.VarChar(20)
+  role          Role        @default(PATIENT)
+  profilePic    String?     @map("profile_pic")
+
+  // Relations 
+  accounts      Account[]
+  sessions      Session[]
+  authenticators Authenticator[]
+
+  patient     Patient?
+  doctor      Doctor?
+  @@map("user")
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String  @map("providerAccountId")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  // Relations
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("account")
+}
+
+model Session {
+  sessionToken String   @id @map("sessionToken")
+  userId      String
+  expires     DateTime
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verificationToken")
+}
+
+model Authenticator {
+  credentialID          String  @unique @map("credentialID")
+  userId               String  @map("userId")
+  providerAccountId    String  @map("providerAccountId")
+  credentialPublicKey  String  @map("credentialPublicKey")
+  counter              Int
+  credentialDeviceType String  @map("credentialDeviceType")
+  credentialBackedUp   Boolean @map("credentialBackedUp")
+  transports          String?
+
+  // Relations
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+  @@map("authenticator")
+}
+
+enum Role {
+  PATIENT         @map("Patient")
+  DOCTOR          @map("Doctor")
+  ADMIN           @map("Admin")
+  HOSPITAL_ADMIN  @map("HospitalAdmin")
+}
+
+// 1. Hospital user Model
+model Huser {
+  id          String    @id @default(uuid()) @map("user_id")
+  fullName    String    @map("full_name")
+  email       String    @unique
+  passwordHash String    @map("password_hash")
+  phone       String?   @unique
+  role        Role      @default(PATIENT)
+  profilePic  String?   @map("profile_pic")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+
+  @@map("users")
+}
+
+// 2. Patients Model
+model Patient {
+  id              String    @id @default(uuid()) @map("patient_id")
+  userId          String    @unique @map("user_id")
+  dob             DateTime
+  gender          Gender
+  bloodType       BloodType?
+  allergy         String?
+  surgery         String?
+  medicalIssue    String?   @map("medical_issue")
+  emergencyContact String?  @map("emergency_contact")
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicalRecords  MedicalRecord[]
+  familyHistory   FamilyHistory[]
+  appointments    Appointment[]
+  emergencyRequests EmergencyRequest[]
+  prescriptions   Prescription[]
+
+  @@map("patients")
+}
+
+// 3. Doctors Model
+model Doctor {
+  id              String    @id @default(uuid()) @map("doctor_id")
+  userId          String    @unique @map("user_id")
+  specialization  String
+  hospitalId      String?   @map("hospital_id")
+  experience      Int
+  availability    Boolean   @default(true)
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+  medicalRecords  MedicalRecord[]
+  appointments    Appointment[]
+  prescriptions   Prescription[]
+
+  @@map("doctors")
+}
+
+// 4. Hospitals Model
+model Hospital {
+  id              String    @id @default(uuid()) @map("hospital_id")
+  name            String
+  address         String
+  phone           String    @unique
+  totalBeds       Int       @default(0) @map("total_beds")
+  availableBeds   Int       @default(0) @map("available_beds")
+  icuBeds         Int       @default(0) @map("icu_beds")
+  ventilators     Int       @default(0)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  doctors         Doctor[]
+  medicalRecords  MedicalRecord[]
+  appointments    Appointment[]
+  emergencyRequests EmergencyRequest[]
+
+  @@map("hospitals")
+}
+
+// 5. Medical Records Model
+model MedicalRecord {
+  id              String    @id @default(uuid()) @map("record_id")
+  patientId       String    @map("patient_id")
+  doctorId        String?   @map("doctor_id")
+  hospitalId      String?   @map("hospital_id")
+  diagnosis       String
+  prescription    String?
+  reportUrl       String?   @map("report_url")
+  consultationDate DateTime @default(now()) @map("consultation_date")
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          Doctor?   @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+
+  @@map("medical_records")
+}
+
+// 6. Family Medical History Model
+model FamilyHistory {
+  id              String    @id @default(uuid()) @map("family_id")
+  patientId       String    @map("patient_id")
+  relativeName    String?   @map("relative_name")
+  relationship    Relationship?
+  condition       String
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("family_history")
+}
+
+// 7. Appointments Model
+model Appointment {
+  id              String    @id @default(uuid()) @map("appointment_id")
+  patientId       String    @map("patient_id")
+  doctorId        String    @map("doctor_id")
+  hospitalId      String?   @map("hospital_id")
+  appointmentDate DateTime  @map("appointment_date")
+  status          AppointmentStatus @default(SCHEDULED)
+  consultationType ConsultationType?  @map("consultation_type")
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+
+  @@map("appointments")
+}
+
+// 8. Emergency Requests Model
+model EmergencyRequest {
+  id              String    @id @default(uuid()) @map("request_id")
+  patientId       String    @map("patient_id")
+  hospitalId      String    @map("hospital_id")
+  urgencyLevel    UrgencyLevel? @map("urgency_level")
+  status          RequestStatus @default(PENDING)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  hospital        Hospital  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
+  @@map("emergency_requests")
+}
+
+// 9. Prescriptions Model
+model Prescription {
+  id              String    @id @default(uuid()) @map("prescription_id")
+  patientId       String    @map("patient_id")
+  doctorId        String    @map("doctor_id")
+  issuedDate      DateTime  @default(now()) @map("issued_date")
+  medicines       Json
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("prescriptions")
+}
+
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum BloodType {
+  A_POSITIVE  @map("A+")
+  A_NEGATIVE  @map("A-")
+  B_POSITIVE  @map("B+")
+  B_NEGATIVE  @map("B-")
+  O_POSITIVE  @map("O+")
+  O_NEGATIVE  @map("O-")
+  AB_POSITIVE @map("AB+")
+  AB_NEGATIVE @map("AB-")
+}
+
+enum Relationship {
+  Father
+  Mother
+  Sibling
+  Grandparent
+  Other
+}
+
+enum AppointmentStatus {
+  SCHEDULED   @map("Scheduled")
+  COMPLETED   @map("Completed")
+  CANCELLED   @map("Cancelled")
+}
+
+enum ConsultationType {
+  IN_PERSON   @map("In-Person")
+  VIDEO       @map("Video")
+}
+
+enum UrgencyLevel {
+  LOW       @map("Low")
+  MEDIUM    @map("Medium")
+  HIGH      @map("High")
+  CRITICAL  @map("Critical")
+}
+
+enum RequestStatus {
+  PENDING    @map("Pending")
+  ACCEPTED   @map("Accepted")
+  REJECTED   @map("Rejected")
+}

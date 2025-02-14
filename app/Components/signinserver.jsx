@@ -1,7 +1,7 @@
-'use server'
+// 'use server'
 
-import { signIn } from '@/auth'  // Import your signIn logic
+// import { signIn } from "next-auth/react"
 
-export async function handleGoogleSignIn() {
-  await signIn("google")  // Perform GitHub sign-in on the server
-}
+// export async function handleGoogleSignIn() {
+//   await signIn()
+// }
