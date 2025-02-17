@@ -55,12 +55,12 @@ const Sidebar = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   // Redirect to Appointments
-                  window.location.href = '/appointments'; // Example redirect
+                  window.location.href = '/admin/ambulance_management'; // Example redirect
                   setIsOpen(false);
                 }}
               >
                 <Calendar className="w-5 h-5 mr-3" />
-                <span>Appointments</span>
+                <span>Ambulance Management</span>
               </a>
             </li>
             <li>
