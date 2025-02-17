@@ -370,21 +370,7 @@ const Dashboard = () => {
      
 
       <main className="flex-1 p-8 ">
-        <div className="mb-4">
-          <label htmlFor="userType" className="mr-2  ">
-            Select User Type:
-          </label>
-          <select
-            id="userType"
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="border rounded p-1  bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-          >
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
-            <option value="admin">Hospital Admin</option>
-          </select>
-        </div>
+        
 
         {userType === 'patient' && (
           <>
