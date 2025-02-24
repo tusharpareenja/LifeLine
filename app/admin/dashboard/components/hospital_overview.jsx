@@ -56,7 +56,7 @@ export default function HospitalOverview() {
               <span className="text-gray-300">ICU Capacity:</span>
               <span className="text-xl font-bold text-yellow-500">{icuCapacity}%</span>
             </div>
-            <Progress value={icuCapacity} className="h-2 bg-gray-700" indicatorClassName="bg-yellow-500" />
+            <Progress value={icuCapacity} className="h-2 bg-gray-700" />
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-300">Emergency Cases:</span>
