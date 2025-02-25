@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Search, Upload, Download, Share2, Moon, Sun, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,9 +15,24 @@ import SearchAndFilters from "./components/SearchAndFilters"
 import QuickActions from "./components/QuickActions"
 import CategorizedMedicalRecords from "./components/CategorizedMedicalRecords"
 import EmergencyHealthSummary from "./components/EmergencyHealthSummary"
+import { useSession } from "next-auth/react"
+import { getPatient } from "@/app/actions/actions"
 
 export default function MedicalHistory() {
   const [darkMode, setDarkMode] = React.useState(false)
+  const [user, setPatientDetails] = useState({});
+  const { data: session } = useSession(); 
+  useEffect(() => {
+      const fetchPatientDetails = async () => {
+        console.log(session)
+        if (session && session.user.id) {
+          const patientData = await getPatient(session.user.patientId);
+          console.log(patientData)
+          setPatientDetails(patientData.data);
+        }
+      };
+      fetchPatientDetails();
+    }, [session]);
 
   React.useEffect(() => {
     if (darkMode) {
@@ -37,7 +52,7 @@ export default function MedicalHistory() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <HeroSection />
+        <HeroSection user={user}/>
         <SearchAndFilters/>
         <QuickActions />
         <CategorizedMedicalRecords />

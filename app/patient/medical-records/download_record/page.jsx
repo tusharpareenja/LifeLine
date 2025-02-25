@@ -1,11 +1,26 @@
 'use client'
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PdfTemplate from "../components/PdfTemplate";
+import { useSession } from "next-auth/react";
+import { getPatient } from "@/app/actions/actions";
 
 const MedicalRecord = () => {
   const recordRef = useRef(null);
+  const [user, setPatientDetails] = useState({});
+  const { data: session } = useSession(); 
+  useEffect(() => {
+      const fetchPatientDetails = async () => {
+        console.log(session)
+        if (session && session.user.id) {
+          const patientData = await getPatient(session.user.patientId);
+          console.log(patientData)
+          setPatientDetails(patientData.data);
+        }
+      };
+      fetchPatientDetails();
+    }, [session]);
 
   const downloadPDF = () => {
     const input = recordRef.current;
@@ -22,7 +37,7 @@ const MedicalRecord = () => {
   return (
     <div>
       <div ref={recordRef} className="p-4 bg-white shadow-md">
-        <PdfTemplate />
+        <PdfTemplate user={user} />
       </div>
       <button onClick={downloadPDF} className="mt-4 bg-blue-500 text-white p-2 rounded">
         Download PDF

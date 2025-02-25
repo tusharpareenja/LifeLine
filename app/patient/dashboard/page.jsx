@@ -10,7 +10,11 @@ import {  Droplet, User } from 'lucide-react'
 import { getSession, useSession } from 'next-auth/react';
 import { getPatient } from '@/app/actions/actions';
 
+
 // Mock data
+
+
+
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
   { id: 2, doctor: 'Dr. Johnson', date: '2025-02-18', time: '2:30 PM' },
@@ -42,7 +46,12 @@ const user = {
   // In your JSX
 
 
+
+
 const WelcomeBanner = ({ user }) => (
+ 
+
+
 <Card className="bg-blue-50 border-blue-200  dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="w-16 h-16">
@@ -50,11 +59,11 @@ const WelcomeBanner = ({ user }) => (
           {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
         </Avatar>
         <div className="flex flex-col">
-          <h2 className="text-2xl font-bold">{user.name}</h2>
+          <h2 className="text-2xl font-bold">{user.user?.name}</h2>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {user.age} years
+              {new Date(user.dob).toDateString()}
             </span>
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
@@ -119,9 +128,25 @@ const EmergencyServices = () => (
       <CardTitle>Emergency Services</CardTitle>
     </CardHeader>
     <CardContent className="flex flex-col space-y-2">
-      <Button variant="destructive">911 Emergency</Button>
-      <Button>Book Ambulance</Button>
-      <Button>Find Blood Banks</Button>
+    <Button
+  variant="destructive"
+  onClick={() => window.location.href = "tel:112"}
+>
+  112 Emergency
+</Button>
+
+<Button
+  onClick={() => window.open("https://medulance.com/", "_blank")}
+>
+  Book Ambulance
+</Button>
+
+<Button
+  onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
+>
+  Find Blood Banks
+</Button>
+
     </CardContent>
   </Card>
 );
@@ -329,7 +354,7 @@ const AnalyticsReports = () => (
 
 const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
-  const [patientdetails, setPatientDetails] = useState({});
+  const [user, setPatientDetails] = useState({});
   const { data: session } = useSession(); // Assuming session contains user info
 
   useEffect(() => {
@@ -343,23 +368,50 @@ const Dashboard = () => {
     };
     fetchPatientDetails();
   }, [session]);
+  
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <WelcomeBanner user={patientdetails} />
-      <UpcomingAppointments appointments={upcomingAppointments} />
-      <DoctorRecommendations doctors={doctorRecommendations} />
-      <HospitalBedAvailability hospitals={hospitalBedAvailability} />
-      <EmergencyServices />
-      <RecentMedicalReports reports={recentMedicalReports} />
-      <AppointmentsOverview />
-      <PatientMedicalHistoryPreview />
-      <EmergencyRequestsWidget />
-      <VideoConsultationButton />
-      <LiveBedOccupancyTracker />
-      <DoctorStaffManagement />
-      <EmergencyCasesPanel />
-      <AnalyticsReports />
+    <div className="flex h-screen  bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+     
+
+      <main className="flex-1 p-8 ">
+        {userType === 'patient' && (
+          <>
+            <WelcomeBanner user={user} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <UpcomingAppointments appointments={upcomingAppointments} />
+              <HospitalBedAvailability hospitals={hospitalBedAvailability} />
+              <EmergencyServices />
+              <DoctorRecommendations doctors={doctorRecommendations} />
+              <RecentMedicalReports reports={recentMedicalReports} />
+            </div>
+          </>
+        )}
+
+        {userType === 'doctor' && (
+          <>
+            <h2 className="text-2xl font-bold mb-6">Doctor Dashboard</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <AppointmentsOverview />
+              <PatientMedicalHistoryPreview />
+              <EmergencyRequestsWidget />
+              <VideoConsultationButton />
+            </div>
+          </>
+        )}
+
+        {userType === 'admin' && (
+          <>
+            <h2 className="text-2xl font-bold mb-6">Hospital Admin Dashboard</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <LiveBedOccupancyTracker />
+              <DoctorStaffManagement />
+              <EmergencyCasesPanel />
+              <AnalyticsReports />
+            </div>
+          </>
+        )}
+      </main>
     </div>
   );
 };

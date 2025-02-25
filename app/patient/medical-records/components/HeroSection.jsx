@@ -1,28 +1,21 @@
 "use client"
 
-import React from "react"
-import { Search, Upload, Download, Share2, Moon, Sun, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
-export default function HeroSection() {
+export default function HeroSection({user}) {
     return (
       <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src="/placeholder.svg" alt="John Doe" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={user.user.profilePic} alt={user.user.name} />
+              <AvatarFallback>{user.user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-2xl font-bold">John Doe</h2>
-              <p className="text-gray-500 dark:text-gray-400">Patient ID: 123456</p>
+              <h2 className="text-2xl font-bold">{user.user?.name}</h2>
+              <p className="text-gray-500 dark:text-gray-400">Patient ID: {user.id}</p>
               <div className="mt-2 flex items-center">
                 <span className="text-sm font-medium mr-2">Health Score:</span>
                 <Badge variant="secondary">85/100</Badge>

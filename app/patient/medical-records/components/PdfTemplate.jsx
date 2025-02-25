@@ -17,7 +17,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 
-const MedicalRecord = () => {
+const MedicalRecord = ({user}) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Full width with container for content */}
@@ -49,11 +49,11 @@ const MedicalRecord = () => {
                 <div className="space-y-3">
                   <p className="flex items-center text-gray-600">
                     <Calendar className="w-4 h-4 mr-2" />
-                    Date of Birth: 15/03/1985
+                    Date of Birth: {new Date(user.dob)?.toDateString()}
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Phone className="w-4 h-4 mr-2" />
-                    Contact: +1 (555) 123-4567
+                    Contact: {user.user?.phone ?? "null"}
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Mail className="w-4 h-4 mr-2" />
