@@ -40,7 +40,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/pages/dashboard';
+                  window.location.href = '/doctor/dashboard';
                   setIsOpen(false);
                 }}
               >
@@ -55,7 +55,7 @@ const Sidebar = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   // Redirect to Appointments
-                  window.location.href = '/appointments'; // Example redirect
+                  window.location.href = '/doctor/appointment_management'; // Example redirect
                   setIsOpen(false);
                 }}
               >
@@ -63,21 +63,7 @@ const Sidebar = () => {
                 <span>Appointments</span>
               </a>
             </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/pages/add-patient';
-                  setIsOpen(false);
-                }}
-              >
-                <UserPlus className="w-5 h-5 mr-3" />
-                <span>Add Patient</span>
-              </a>
-              
-            </li>
+            
             <li>
               <a
                 href="#"

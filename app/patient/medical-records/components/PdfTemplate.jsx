@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   Syringe, 
@@ -16,8 +16,45 @@ import {
   CalendarClock,
   Stethoscope
 } from 'lucide-react';
+import { chatSession } from '@/config/AiModel';
 
-const MedicalRecord = ({user}) => {
+const MedicalRecord = () => {
+  // State for managing the overview data
+  const [overview, setOverview] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+
+  // Fetch overview from Gemini AI when component mounts
+  useEffect(() => {
+    const fetchOverview = async () => {
+      setIsLoading(true);
+      try {
+        const BASIC_PROMPT = `Generate a 100-word medical overview for a patient with the following details:
+        - Medications: Lisinopril 10mg daily, Albuterol inhaler as needed
+        - Allergies: Penicillin (severe), Pollen (moderate)
+        - Past Surgeries: Appendectomy (2015), Knee Arthroscopy (2018)`;
+  
+        const result = await chatSession.sendMessage(BASIC_PROMPT);
+        
+        // Ensure response is properly retrieved
+        const Overview = result?.response?.text || "No response received";  
+        
+        console.log(Overview); // Now this should log properly
+        setOverview(Overview); // Update state so it renders in the UI
+      } catch (error) {
+        console.error('Error generating overview:', error);
+        setError('Failed to fetch medical overview.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchOverview();
+  }, []);
+   // Empty dependency array ensures this runs once on mount
+   // Empty dependency array ensures this runs once on mount
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Full width with container for content */}
@@ -36,6 +73,24 @@ const MedicalRecord = ({user}) => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
+        {/* Overview Section */}
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <Activity className="w-5 h-5 mr-2" />
+              Medical Overview
+            </h2>
+            {isLoading ? (
+              <p className="text-gray-500">Loading overview...</p>
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              <p className="text-gray-700">{overview}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Existing Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-1 space-y-6">

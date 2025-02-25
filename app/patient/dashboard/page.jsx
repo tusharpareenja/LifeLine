@@ -375,6 +375,11 @@ const Dashboard = () => {
      
 
       <main className="flex-1 p-8 ">
+<<<<<<< HEAD
+=======
+        
+
+>>>>>>> 0ef9ee02700e280a1bfcc3e33feeac4de47e189d
         {userType === 'patient' && (
           <>
             <WelcomeBanner user={user} />
