@@ -4,7 +4,7 @@ import { PatientForm } from '../components/PatientForm';
 import { PatientList } from '../components/PatientList';
 import { Plus } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { createPatient, deletePatient, getPatients, updatePatient } from '@/app/actions/actions';
+import { createPatient, deletePatient, getPatients, updatePatient } from '@/app/actions/hospitals';
 
 function App() {
   const [showForm, setShowForm] = useState(false);
