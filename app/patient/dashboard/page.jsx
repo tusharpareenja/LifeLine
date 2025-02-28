@@ -8,7 +8,7 @@ import { Avatar, AvatarImage, avatarUrl, AvatarFallback } from '@/components/ui/
 import image from '../../../public/Images/profile_pic.jpg'
 import {  Droplet, User } from 'lucide-react'
 import { getSession, useSession } from 'next-auth/react';
-import { getPatient } from '@/app/actions/actions';
+import { getPatients } from '../../actions/patients.js';
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
@@ -30,8 +30,6 @@ const recentMedicalReports = [
   { id: 2, title: 'X-Ray Report', date: '2025-01-28' },
 ];
 
-<<<<<<< HEAD
-=======
 const user = {
     name: "Tushar Pareenja",
     age: 35,
@@ -44,7 +42,6 @@ const user = {
 
 
 
->>>>>>> df3f6f8a7ce5fb81455638d9287616a140fdc94d
 
 const WelcomeBanner = ({ user }) => (
 

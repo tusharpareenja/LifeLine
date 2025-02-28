@@ -40,7 +40,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/admin/dashboard';
+                  window.location.href = '/hospital/dashboard';
                   setIsOpen(false);
                 }}
               >
@@ -55,7 +55,7 @@ const Sidebar = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   // Redirect to Appointments
-                  window.location.href = '/admin/ambulance_management'; // Example redirect
+                  window.location.href = '/hospital/ambulance_management'; // Example redirect
                   setIsOpen(false);
                 }}
               >
@@ -69,7 +69,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/admin/add-patient';
+                  window.location.href = '/hospital/add-patient';
                   setIsOpen(false);
                 }}
               >
@@ -84,7 +84,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/pages/consultation_medication';
+                  window.location.href = '/hospital/consultation_medication';
                   setIsOpen(false);
                 }}
               >
@@ -98,7 +98,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/admin/Subsidies'; 
+                  window.location.href = '/hospital/Subsidies'; 
                   setIsOpen(false);
                 }}
               >
@@ -112,7 +112,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/admin/social-services';
+                  window.location.href = '/hospital/social-services';
                   setIsOpen(false);
                 }}
               >
