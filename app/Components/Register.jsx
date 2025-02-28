@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
-import { handleGoogleSignIn } from "./signinserver"
 import { toast } from "sonner"
 
 const RegisterForm = ({role}) => {
@@ -12,6 +11,8 @@ const RegisterForm = ({role}) => {
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
   const [error, setError] = useState("")
+  const path = window.location.pathname
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -146,7 +147,11 @@ const RegisterForm = ({role}) => {
       </button>
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">
         New to LifeLine?{" "}
-        <a href="/admin/login" className="font-medium text-blue-600 hover:text-blue-500">
+        <a 
+        href={
+            path === "/register/patient" ? "/login/patient" : path === "/register/hospital" ? "/login/hospital" : path === "/register/doctor" ? "/login/doctor" : "#"
+          }
+        className="font-medium text-blue-600 hover:text-blue-500">
           Login Here
         </a>
       </p>

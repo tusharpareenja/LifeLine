@@ -1,14 +1,12 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react';
-import { Bell, Calendar, FileText, Home, LogOut, MessageSquare, Settings } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {Calendar} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarImage, avatarUrl, AvatarFallback } from '@/components/ui/avatar';
-import image from '../../../public/Images/profile_pic.jpg'
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import {  Droplet, User } from 'lucide-react'
-import { getSession, useSession } from 'next-auth/react';
-import { getPatients } from '../../actions/patients.js';
+import { getPatientById } from '../../actions/patients.js';
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
@@ -21,27 +19,14 @@ const hospitalBedAvailability = [
 ];
 
 const doctorRecommendations = [
-  { id: 1, name: 'Dr. Emily Chen', specialty: 'Cardiologist' },
-  { id: 2, name: 'Dr. Michael Lee', specialty: 'Neurologist' },
+  { id: 1, name: 'Dr. Emily Chen', specialization: ['Cardiologist'] },
+  { id: 2, name: 'Dr. Michael Lee', specialization: ['Neurologist'] },
 ];
 
 const recentMedicalReports = [
   { id: 1, title: 'Blood Test Results', date: '2025-02-01' },
   { id: 2, title: 'X-Ray Report', date: '2025-01-28' },
 ];
-
-const user = {
-    name: "Tushar Pareenja",
-    age: 35,
-    gender: "Male",
-    bloodType: "A+",
-    avatarUrl: {image}
-  }
-  
-  // In your JSX
-
-
-
 
 const WelcomeBanner = ({ user }) => (
 
@@ -84,11 +69,11 @@ const UpcomingAppointments = ({ appointments }) => (
     </CardHeader>
     <CardContent>
       <ul className="space-y-2">
-        {appointments.map((appointment) => (
+        {appointments?.map((appointment) => (
           <li key={appointment.id} className="flex justify-between items-center">
             <span>{appointment.doctor}</span>
             <span className="text-sm text-gray-500">
-              {appointment.date} at {appointment.time}
+              {appointment.date}
             </span>
           </li>
         ))}
@@ -104,7 +89,7 @@ const HospitalBedAvailability = ({ hospitals }) => (
     </CardHeader>
     <CardContent>
       <ul className="space-y-2">
-        {hospitals.map((hospital, index) => (
+        {hospitals?.map((hospital, index) => (
           <li key={index} className="flex justify-between items-center">
             <span>{hospital.hospital}</span>
             <span className="font-bold text-green-600">{hospital.availableBeds} beds</span>
@@ -151,10 +136,10 @@ const DoctorRecommendations = ({ doctors }) => (
     </CardHeader>
     <CardContent>
       <ul className="space-y-2">
-        {doctors.map((doctor) => (
+        {doctors?.map((doctor) => (
           <li key={doctor.id} className="flex justify-between items-center">
             <span>{doctor.name}</span>
-            <span className="text-sm text-gray-500">{doctor.specialty}</span>
+            <span className="text-sm text-gray-500">{doctor.specialization}</span>
           </li>
         ))}
       </ul>
@@ -348,20 +333,15 @@ const AnalyticsReports = () => (
 const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
   const [user, setPatientDetails] = useState({});
-  const { data: session } = useSession(); // Assuming session contains user info
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
-      console.log(session)
-      if (session && session.user.id) {
-        console.log(session.user)
-        const patientData = await getPatient(session.user.patientId);
-        console.log(patientData)
-        setPatientDetails(patientData.data);
-      }
+      const patientData = await getPatientById(sessionStorage.getItem("patientId"));
+      console.log(patientData)
+      setPatientDetails(patientData.data);
     };
     fetchPatientDetails();
-  }, [session]);
+  }, []);
   
 
   return (
@@ -375,10 +355,10 @@ const Dashboard = () => {
           <>
             <WelcomeBanner user={user} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <UpcomingAppointments appointments={upcomingAppointments} />
-              <HospitalBedAvailability hospitals={hospitalBedAvailability} />
+              <UpcomingAppointments appointments={user.appointments} /> 
+              <HospitalBedAvailability hospitals={user.hospitals} />
               <EmergencyServices />
-              <DoctorRecommendations doctors={doctorRecommendations} />
+              <DoctorRecommendations doctors={user.doctors} />
               <RecentMedicalReports reports={recentMedicalReports} />
             </div>
           </>

@@ -3,6 +3,7 @@
 
 import { revalidatePath } from "next/cache";
 import db  from '../db/db'
+import DoctorSearch from "../patient/components/doctor-section";
 
 // Create a new patient
 export async function createPatient(data) {
@@ -35,14 +36,13 @@ export async function createPatient(data) {
 }
 
 // Get all patients (with optional filtering)
-export async function getPatients(filter) {
+export async function getPatients(id) {
   try {
-    const where = filter?.hospitalId ? { 
-      hospitals: { some: { id: filter.hospitalId } } 
-    } : {};
 
-    const patients = await db.patient.findMany({
-      where,
+    const patients = await db.patient.findUnique({
+      where : {
+        id
+      },
       include: {
         user: {
           select: {
@@ -71,6 +71,8 @@ export async function getPatientById(id) {
             email: true
           }
         },
+        hospitals : true,
+        doctors : true,
         medicalRecords: true,
         familyHistory: true,
         appointments: {

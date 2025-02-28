@@ -1,26 +1,53 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Check, X, Info, Building2, Users, Bed, Activity, Phone, MapPin, Calendar } from 'lucide-react';
+import { approveHospital, getHospitalRequests } from '../actions/admin';
+import { toast } from 'sonner';
 
 // Define the combined type for hospitals with user data and approval status
 
 
 function App() {
-  const [hospitals, setHospitals] = useState(mockHospitals);
+  const [hospitals, setHospitals] = useState([]);
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
-  const handleApprove = (id) => {
-    setHospitals(hospitals.map(hospital => 
-      hospital.id === id ? { ...hospital, approved: true, pending: false } : hospital
-    ));
+  const getHospitals = async () => {
+    const res = await getHospitalRequests()
+    console.log(res)
+    setHospitals(res)
+  }
+  useEffect(()=>{
+    getHospitals()
+  },[])
+  const handleApprove = async(id) => {
+    try {
+      await approveHospital(id)
+      setHospitals(hospitals.map(hospital => 
+        hospital.id === id ? { ...hospital, approved: true, pending: false } : hospital
+      ));
+    } catch(e) {
+      toast.error(e.message)
+      setHospitals(hospitals.map(hospital => 
+        hospital.id === id ? { ...hospital, approved: false, pending: false } : hospital
+      ));
+    }
   };
 
-  const handleReject = (id) => {
-    setHospitals(hospitals.map(hospital => 
-      hospital.id === id ? { ...hospital, approved: false, pending: false } : hospital
-    ));
+  const handleReject = async (id) => {
+    try {
+      await rejectHospital(id)
+      setHospitals(hospitals.map(hospital => 
+        hospital.id === id ? { ...hospital, approved: false, pending: false } : hospital
+      ));
+    } catch(e) {
+      toast.error(e.message)
+      setHospitals(hospitals.map(hospital => 
+        hospital.id === id ? { ...hospital, approved: false, pending: false } : hospital
+      ));
+    }
+    
   };
 
   const handleShowDetails = (hospital) => {
@@ -274,119 +301,5 @@ function App() {
     </div>
   );
 }
-
-// Mock data for demonstration
-const mockHospitals = [
-  {
-    id: "1",
-    userId: "user1",
-    name: "City General Hospital",
-    address: "123 Main St, Cityville, CA 90001",
-    phone: "+1 (555) 123-4567",
-    totalBeds: 200,
-    availableBeds: 45,
-    icuBeds: 20,
-    ventilators: 15,
-    createdAt: "2023-01-15T08:30:00Z",
-    pending: true,
-    approved: false,
-    user: {
-      id: "user1",
-      name: "City General Admin",
-      email: "admin@citygeneral.com",
-      password: "hashed_password",
-      role: "HOSPITAL",
-      createdAt: "2023-01-10T10:00:00Z"
-    }
-  },
-  {
-    id: "2",
-    userId: "user2",
-    name: "Memorial Medical Center",
-    address: "456 Oak Ave, Townsville, CA 90002",
-    phone: "+1 (555) 987-6543",
-    totalBeds: 350,
-    availableBeds: 120,
-    icuBeds: 40,
-    ventilators: 30,
-    createdAt: "2023-02-20T14:15:00Z",
-    pending: true,
-    approved: false,
-    user: {
-      id: "user2",
-      name: "Memorial Admin",
-      email: "admin@memorialmed.com",
-      password: "hashed_password",
-      role: "HOSPITAL",
-      createdAt: "2023-02-15T09:30:00Z"
-    }
-  },
-  {
-    id: "3",
-    userId: "user3",
-    name: "Riverside Healthcare",
-    address: "789 River Rd, Riverside, CA 90003",
-    phone: "+1 (555) 456-7890",
-    totalBeds: 150,
-    availableBeds: 30,
-    icuBeds: 15,
-    ventilators: 10,
-    createdAt: "2023-03-10T11:45:00Z",
-    pending: false,
-    approved: true,
-    user: {
-      id: "user3",
-      name: "Riverside Admin",
-      email: "admin@riverside.com",
-      password: "hashed_password",
-      role: "HOSPITAL",
-      createdAt: "2023-03-05T13:20:00Z"
-    }
-  },
-  {
-    id: "4",
-    userId: "user4",
-    name: "Lakeside Medical Center",
-    address: "321 Lake Blvd, Laketown, CA 90004",
-    phone: "+1 (555) 789-0123",
-    totalBeds: 250,
-    availableBeds: 75,
-    icuBeds: 25,
-    ventilators: 20,
-    createdAt: "2023-04-05T16:30:00Z",
-    pending: false,
-    approved: true,
-    user: {
-      id: "user4",
-      name: "Lakeside Admin",
-      email: "admin@lakesidemed.com",
-      password: "hashed_password",
-      role: "HOSPITAL",
-      createdAt: "2023-04-01T10:45:00Z"
-    }
-  },
-  {
-    id: "5",
-    userId: "user5",
-    name: "Valley Community Hospital",
-    address: "567 Valley Way, Valleytown, CA 90005",
-    phone: "+1 (555) 234-5678",
-    totalBeds: 180,
-    availableBeds: 50,
-    icuBeds: 18,
-    ventilators: 12,
-    createdAt: "2023-05-12T09:15:00Z",
-    pending: true,
-    approved: false,
-    user: {
-      id: "user5",
-      name: "Valley Admin",
-      email: "admin@valleyhosp.com",
-      password: "hashed_password",
-      role: "HOSPITAL",
-      createdAt: "2023-05-10T08:00:00Z"
-    }
-  }
-];
 
 export default App;

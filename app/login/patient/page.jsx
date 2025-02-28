@@ -23,7 +23,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 transition-colors duration-200">
         <DarkModeToggle/>
         <Logo />
-        <LoginForm />
+        <LoginForm  role={"PATIENT"}/>
       </div>
     </div>
   );

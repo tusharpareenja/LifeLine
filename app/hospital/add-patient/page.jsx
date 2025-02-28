@@ -3,16 +3,22 @@ import React, { useEffect, useState } from 'react';
 import { PatientForm } from '../components/PatientForm';
 import { PatientList } from '../components/PatientList';
 import { Plus } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
 import { createPatient, deletePatient, getPatients, updatePatient } from '@/app/actions/hospitals';
+import { toast } from 'sonner';
+import useSendEmail, { generatePassword } from '@/lib/utils';
 
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const hospitalId = sessionStorage.getItem("hospitalId");
+  const { sendEmail } = useSendEmail();
 
   const handleSubmit = async (data) => {
+    const password = generatePassword(8);
+    const newData = { ...data, password };
+    
     try {
       if (selectedPatient) {
         const result = await updatePatient(selectedPatient.id, data);
@@ -23,9 +29,19 @@ function App() {
           toast.error(result.error || 'Failed to update patient');
         }
       } else {
-        const result = await createPatient(data);
+        const result = await createPatient({
+          data : newData,
+          hospitalId
+        });
         if (result.success) {
           toast.success('Patient added successfully');
+          console.log(result)
+          await sendEmail({
+            to: result.data.user.email,
+            subject: 'Patient Account created succesfully !',
+            text: `Your patient account has been created by ${result.data.hospitals[0].name}`,
+            html: `<p>Your password is: <strong>${password}</strong></p>`
+        })
           fetchPatients();
         } else {
           toast.error(result.error || 'Failed to add patient');
@@ -70,11 +86,12 @@ function App() {
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const result = await getPatients();
+      const id = sessionStorage.getItem("hospitalId")
+      const result = await getPatients(id);
       if (result.success) {
         setPatients(result.data);
       } else {
-        toast.error(result.error || 'Failed to fetch patients');
+        toast.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching patients:', error);
@@ -90,7 +107,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Toaster position="top-right" />
       
       {/* Header */}
       <header className="bg-white shadow-lg">

@@ -4,11 +4,19 @@ import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
 import { signIn } from "next-auth/react"
+import { toast } from "sonner"
+import { LoginHospital, Loginnn } from "../actions/hospitals"
+import { redirect, useRouter } from "next/navigation"
 
-const LoginForm = () => {
+const LoginForm = ({role}) => {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const router = useRouter()
+  const path = window.location.pathname
+  console.log(path)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -17,14 +25,18 @@ const LoginForm = () => {
 
     // Simulate API call
     try{
-      const res = await Login({
+      console.log(email,password,role)
+      const res = await Loginnn({
         email,
-        password
+        password,
+        role
       })
 
       if (res.success) {
         // Login successful
         toast.success("Login successful")
+        role === "HOSPITAL" ? sessionStorage.setItem("hospitalId" , res.data.hospital.id) : role === "PATIENT" ? sessionStorage.setItem("patientId" , res.data.patient.id) : role === "DOCTOR" ? sessionStorage.setItem("doctorId" , res.data.doctor.id) : null
+        role === "HOSPITAL" ? router.push("/hospital/dashboard") : role === "PATIENT" ? router.push("/patient/dashboard") : role === "DOCTOR" ? router.push("/doctor/dashboard") : null
       } else {
         // Login failed
         toast.error("Login failed")
@@ -49,6 +61,7 @@ const LoginForm = () => {
           type="text"
           placeholder="Enter your registered email or phone"
           required
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
         />
       </div>
@@ -62,6 +75,7 @@ const LoginForm = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             required
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
           />
           <button
@@ -124,7 +138,12 @@ const LoginForm = () => {
       </button>
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">
         New to LifeLine?{" "}
-        <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+        <a
+          href={
+            path === "/login/patient" ? "/register/patient" : path === "/login/hospital" ? "/register/hospital" : path === "/login/doctor" ? "/register/doctor" : "#"
+          }
+          className="font-medium text-blue-600 hover:text-blue-500"
+        >
           Register Here
         </a>
       </p>

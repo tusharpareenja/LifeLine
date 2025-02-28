@@ -1,32 +1,123 @@
-// app/actions/patient.ts
 "use server";
 
 import { revalidatePath } from "next/cache";
-import db from "../db/db";
+import { PrismaClient } from "@prisma/client";
+import { id } from "ethers";
 
-// Create a new patient
-export async function createPatient(data) {
+const db = new PrismaClient();
+
+export const registerHospital = async (additionalData) => {
   try {
+    console.log("Additional Data:", additionalData);
+
+    // Check if additionalData is provided
+    if (!additionalData) {
+      throw new Error("No data provided");
+    }
+
+    // Create the user and hospital
+    const user = await db.user.create({
+      data: {
+        email: additionalData.email,
+        password: additionalData.password, // Ensure you hash the password before saving
+        name: additionalData.name,
+        role: "HOSPITAL",
+        hospital: {
+          create: {
+            name: additionalData.name,
+            address: additionalData.address,
+            phone: additionalData.phone,
+            totalBeds: additionalData.totalBeds,
+            availableBeds: additionalData.availableBeds,
+            icuBeds: additionalData.icuBeds,
+            ventilators: additionalData.ventilators,
+          },
+        },
+      },
+    });
+
+    // revalidatePath("/hospitals");
+    return { success: true, data: user };
+  } catch (error) {
+    console.error("Failed to create user:", error);
+    return { success: false, error: error.message || "Failed to create user" };
+  }
+};
+export const Loginnn = async ({email, password , role}) => {
+  try {
+
+    const user = await db.user.findUnique({
+      where: { email , role },
+      include: {
+        hospital: true,
+        patient: true,
+        doctor: true
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.password !== password) {
+      throw new Error("Invalid password");
+    }
+
+    return { success: true, data: user };
+  } catch (error) {
+    console.error("Failed to login:", error);
+    return { success: false, error: error.message || "Failed to login" };
+  }
+}
+
+export async function createPatient({data, hospitalId}) {
+  console.log(data , hospitalId)
+  try {
+    // Create the user first
+    const newUser = await db.user.create({
+      data: {
+        email: data.user.email, // Ensure email is provided in the data
+        password: data.password, 
+        name: data.user.name,
+        role: "PATIENT", // Set the role to PATIENT
+      },
+    });
+
+    console.log(newUser)
+
+    // Create the patient and connect to the newly created user and the hospital
     const newPatient = await db.patient.create({
       data: {
-        name: data.name,
-        phone: data.phone,
-        dob: new Date(data.dob),
+        name: data.user.name,
+        phone: data.user.phone,
+        dob: new Date(data.dob), // Convert string to Date
         gender: data.gender,
-        bloodType: data.bloodType , // Cast to enum
+        bloodType: data.bloodType, // Ensure this matches your enum
         allergy: data.allergy,
         surgery: data.surgery,
         medicalIssue: data.medicalIssue,
         emergencyContact: data.emergencyContact,
         user: {
           connect: {
-            id: session.user.id
-          }
-        }
-      }
+            id: newUser.id, // Connect to the newly created user
+          },
+        },
+        hospitals: {
+          connect: {
+            id: hospitalId, // Connect to the hospital
+          },
+        },
+      },
+      include: {
+        user: true, // Include the user in the response
+        hospitals: true, // Include the hospital in the response
+      },
     });
+    console.log(newPatient)
 
-    revalidatePath("/patients");
+    // Revalidate the patients page to reflect the new patient
+    // revalidatePath("/patients");
+
     return { success: true, data: newPatient };
   } catch (error) {
     console.error("Failed to create patient:", error);
@@ -35,29 +126,29 @@ export async function createPatient(data) {
 }
 
 // Get all patients (with optional filtering)
-export async function getPatients(filter) {
+export async function getPatients(id) {
   try {
-    const where = filter?.hospitalId ? { 
-      hospitals: { some: { id: filter.hospitalId } } 
-    } : {};
-
+    console.log(id)
     const patients = await db.patient.findMany({
-      where,
+      where : {
+        hospitals: { some: { id } } 
+      },
       include: {
         user: {
           select: {
             name: true,
             email: true
           }
-        }
+        },
       }
     });
+    console.log(patients)
     return { success: true, data: patients };
   } catch (error) {
     console.error("Failed to fetch patients:", error);
     return { success: false, error: "Failed to fetch patients" };
   }
-}
+}[]
 
 // Get a single patient by ID
 export async function getPatientById(id) {
@@ -140,10 +231,6 @@ export async function deletePatient(id) {
       where: { id },
       select: { userId: true }
     });
-
-    if (!patient || patient.userId !== session.user.id) {
-      return { success: false, error: "Unauthorized to delete this patient" };
-    }
 
     await db.patient.delete({
       where: { id }

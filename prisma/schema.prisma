@@ -10,7 +10,7 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid()) @map("user_id")
+  id          String    @id @default(uuid())
   name        String?
   gid         String?
   email       String    @unique
@@ -32,8 +32,8 @@ model User {
 
 // 2. Patients Model
 model Patient {
-  id              String    @id @default(uuid()) @map("patient_id")
-  userId          String    @unique @map("user_id")
+  id              String    @id @default(uuid())
+  userId          String    @unique 
   name            String
   phone           String?   @unique
   dob             DateTime
@@ -46,6 +46,7 @@ model Patient {
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctors         Doctor[]
   hospitals       Hospital[]
   medicalRecords  MedicalRecord[]
   familyHistory   FamilyHistory[]
@@ -58,8 +59,8 @@ model Patient {
 
 // 3. Doctors Model
 model Doctor {
-  id              String    @id @default(uuid()) @map("doctor_id")
-  userId          String    @unique @map("user_id")
+  id              String    @id @default(uuid())
+  userId          String    @unique 
   hospitalId      String   @map("hospital_id")
   specialization  String?
   experience      Int       @default(0)
@@ -68,6 +69,7 @@ model Doctor {
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   hospital        Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  patients        Patient[] 
   medicalRecords  MedicalRecord[]
   appointments    Appointment[]
   prescriptions   Prescription[]
@@ -77,10 +79,11 @@ model Doctor {
 
 // 4. Hospitals Model
 model Hospital {
-  id              String    @id @default(uuid()) @map("hospital_id")
-  userId          String    @unique @map("user_id")
+  id              String    @id @default(uuid())
+  userId          String    @unique
   name            String
   address         String
+  pending         Boolean   @default(true)
   approved        Boolean   @default(false)
   phone           String    @unique
   totalBeds       Int       @default(0) @map("total_beds")
@@ -140,7 +143,7 @@ model Appointment {
   patientId       String    @map("patient_id")
   doctorId        String    @map("doctor_id")
   hospitalId      String?   @map("hospital_id")
-  appointmentDate DateTime  @map("appointment_date")
+  date            DateTime  @map("appointment_date")
   status          AppointmentStatus @default(SCHEDULED)
   consultationType ConsultationType?  @map("consultation_type")
 
