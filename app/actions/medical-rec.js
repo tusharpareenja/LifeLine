@@ -2,17 +2,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db"; // Adjust import to your actual db setup
-import { auth } from "@/auth";
+import db from "../db/db";
+
 
 // Create a new medical record
 export async function createMedicalRecord(data) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+    
     // Verify doctor has permission to create records
     if (data.doctorId) {
       const doctor = await db.doctor.findUnique({

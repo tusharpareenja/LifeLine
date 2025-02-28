@@ -4,8 +4,6 @@ import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { patientRegister } from "../actions/actions"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -19,11 +17,10 @@ const LoginForm = () => {
 
     // Simulate API call
     try{
-      const res = await signIn('credentials', {
+      const res = await Login({
         email,
-        password,
-        action : "patient",
-      });
+        password
+      })
 
       if (res.success) {
         // Login successful

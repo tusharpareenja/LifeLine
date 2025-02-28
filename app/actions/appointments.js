@@ -2,16 +2,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db"; // Adjust import to your actual db setup
-import { auth } from "@/auth";
+import db from "../db/db";
 
 // Create a new appointment
 export async function createAppointment(data) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     // Verify that patient exists
     const patient = await db.patient.findUnique({
@@ -185,10 +180,6 @@ export async function updateAppointmentStatus(
   status
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     // Fetch the appointment
     const appointment = await db.appointment.findUnique({
@@ -233,10 +224,6 @@ export async function rescheduleAppointment(
   newDate
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     // Fetch the appointment
     const appointment = await db.appointment.findUnique({
@@ -281,10 +268,6 @@ export async function rescheduleAppointment(
 // Delete appointment
 export async function deleteAppointment(id) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     // Fetch the appointment
     const appointment = await db.appointment.findUnique({

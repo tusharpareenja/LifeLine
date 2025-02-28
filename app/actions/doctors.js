@@ -2,7 +2,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db"; 
+import db from "../db/db";
 
 // Create a new doctor
 export async function createDoctor(data) {
