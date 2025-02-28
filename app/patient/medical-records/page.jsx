@@ -16,7 +16,7 @@ import QuickActions from "./components/QuickActions"
 import CategorizedMedicalRecords from "./components/CategorizedMedicalRecords"
 import EmergencyHealthSummary from "./components/EmergencyHealthSummary"
 import { useSession } from "next-auth/react"
-import { getPatient } from "@/app/actions/actions"
+import { getPatients } from "../../actions/patients"
 
 export default function MedicalHistory() {
   const [darkMode, setDarkMode] = React.useState(false)
