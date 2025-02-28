@@ -32,7 +32,7 @@ export default function Navbar({ scrollProgress }) {
           <Button variant="ghost">Download</Button>
         </div>
         <div className="flex space-x-2 mr-10">
-          <Link href="/Login/role">
+          <Link href="/login/role">
             <Button variant="outline">Start Here</Button>
           </Link>
         </div>
