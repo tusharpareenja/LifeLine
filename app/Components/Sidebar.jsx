@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Menu, Home, Calendar, FileText, MessageSquare, Bell, Settings, LogOut } from 'lucide-react';
+import { Menu, Home, Calendar, FileText, MessageSquare, Bell, Settings, LogOut, IndianRupee } from 'lucide-react';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -96,12 +96,12 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/patient/emergency-services'; 
+                  window.location.href = '/patient/insurance'; 
                   setIsOpen(false);
                 }}
               >
-                <Bell className="w-5 h-5 mr-3" />
-                <span>Emergency Services</span>
+                <IndianRupee className="w-5 h-5 mr-3" />
+                <span>Insurance</span>
               </a>
             </li>
             <li>
