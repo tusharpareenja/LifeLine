@@ -34,7 +34,7 @@ const recentMedicalReports = [
 ];
 
 const user = {
-    name: "John Doe",
+    name: "Tushar Pareenja",
     age: 35,
     gender: "Male",
     bloodType: "A+",
@@ -193,7 +193,7 @@ const AppointmentsOverview = () => (
     <CardContent>
       <h3 className="font-bold mb-2">Today's Schedule</h3>
       <ul className="space-y-2 mb-4">
-        <li>9:00 AM - John Doe (Checkup)</li>
+        <li>9:00 AM - Tushar Pareenja (Checkup)</li>
         <li>11:30 AM - Jane Smith (Follow-up)</li>
         <li>2:00 PM - Mike Johnson (Consultation)</li>
       </ul>
@@ -212,7 +212,7 @@ const PatientMedicalHistoryPreview = () => (
       <CardTitle>Patient Medical History Preview</CardTitle>
     </CardHeader>
     <CardContent>
-      <h3 className="font-bold mb-2">Upcoming Patient: John Doe</h3>
+      <h3 className="font-bold mb-2">Upcoming Patient: Tushar Pareenja</h3>
       <ul className="space-y-2">
         <li>Last Visit: January 15, 2025</li>
         <li>Allergies: Penicillin</li>

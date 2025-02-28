@@ -23,9 +23,7 @@ const MedicalRecord = () => {
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
-  // Fetch overview from Gemini AI when component mounts
   useEffect(() => {
     const fetchOverview = async () => {
       setIsLoading(true);
@@ -52,8 +50,7 @@ const MedicalRecord = () => {
   
     fetchOverview();
   }, []);
-   // Empty dependency array ensures this runs once on mount
-   // Empty dependency array ensures this runs once on mount
+
 
   return (
     <div className="min-h-screen bg-gray-50">
