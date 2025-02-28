@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
   const pathname = usePathname()
 
   // Define an array of paths where Sidebar should be hidden
-  const hiddenSidebarPaths = ["/login", "/register", "/admin/login", "/patient/login", "/doctor/login"]
+  const hiddenSidebarPaths = ["/login", "/register", "/admin/login", "/patient/login", "/doctor/login" , "/admin/register", "/patient/register", "/doctor/register"]
 
   return (
     <div className="flex h-screen">

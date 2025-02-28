@@ -95,11 +95,10 @@ enum Role {
 }
 
 // 1. Hospital user Model
-model Huser {
+model credentials {
   id          String    @id @default(uuid()) @map("user_id")
-  fullName    String    @map("full_name")
   email       String    @unique
-  passwordHash String    @map("password_hash")
+  password    String    @map("password")
   phone       String?   @unique
   role        Role      @default(PATIENT)
   profilePic  String?   @map("profile_pic")
@@ -107,7 +106,7 @@ model Huser {
   
   // Relations
 
-  @@map("users")
+  @@map("credentials")
 }
 
 // 2. Patients Model
@@ -137,9 +136,9 @@ model Patient {
 model Doctor {
   id              String    @id @default(uuid()) @map("doctor_id")
   userId          String    @unique @map("user_id")
-  specialization  String
+  specialization  String?
   hospitalId      String?   @map("hospital_id")
-  experience      Int
+  experience      Int       @default(0)
   availability    Boolean   @default(true)
 
   // Relations

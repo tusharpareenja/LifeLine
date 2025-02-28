@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { getSession, useSession } from "next-auth/react"
 
 
 
 export default function HeroSection({ darkMode, setDarkMode }) {
   const [notifications, setNotifications] = useState(false)
+  const {data : session} = useSession()
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-teal-400 dark:from-blue-900 dark:to-teal-700 text-white py-6 px-4 rounded-b-3xl shadow-lg">
@@ -21,7 +23,7 @@ export default function HeroSection({ darkMode, setDarkMode }) {
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold">Dr. John Doe</h1>
+            <h1 className="text-2xl font-bold">{session?.user?.name}</h1>
             <p className="text-sm opacity-75">Cardiologist</p>
           </div>
         </div>

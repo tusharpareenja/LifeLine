@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
 import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { patientRegister } from "../actions/actions"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -16,14 +18,27 @@ const LoginForm = () => {
     setError("")
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try{
+      const res = await signIn('credentials', {
+        email,
+        password,
+        action : "patient",
+      });
 
-    // Simulated error (remove in production)
-    setError("Invalid credentials, please try again.")
+      if (res.success) {
+        // Login successful
+        toast.success("Login successful")
+      } else {
+        // Login failed
+        toast.error("Login failed")
+      }
+    } catch(err){
+      toast.error("Login failed " ,err)
+    }
     setLoading(false)
   }
   const handleGoogleLogin = async () => {
-    await signIn("google");
+    await signIn("google" , {redirectTo : "/patient/dashboard"});
   };  
 
   return (

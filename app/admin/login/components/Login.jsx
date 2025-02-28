@@ -3,23 +3,39 @@
 import { useState } from "react"
 import { Eye, EyeOff, Fingerprint, ChromeIcon as Google } from "lucide-react"
 import { handleGoogleSignIn } from "./signinserver"
-import { Router } from "next/router"
-import { useRouter } from 'next/navigation'
+import { adminLogin } from "@/app/actions/actions"
+import { signIn } from "next-auth/react"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError("")
+    try{
+      const res = await signIn('credentials', {
+        email,
+        password,
+        action : "admin",
+        successRedirect : "/admin/dashboard",
+      });
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+      if (res.success) {
+        // Login successful
+        toast.success("Login successful")
+      } else {
+        // Login failed
+        toast.error("Login failed")
+      }
+    } catch(err){
+      toast.error("Login failed " ,err)
+    }
 
-    // Simulated error (remove in production)
     setError("Invalid credentials, please try again.")
     setLoading(false)
   }
@@ -39,6 +55,7 @@ const LoginForm = () => {
           type="text"
           placeholder="Enter your registered email or phone"
           required
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
         />
       </div>
@@ -52,6 +69,7 @@ const LoginForm = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             required
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
           />
           <button
@@ -114,7 +132,7 @@ const LoginForm = () => {
       </button>
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">
         New to LifeLine?{" "}
-        <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+        <a href="/admin/register" className="font-medium text-blue-600 hover:text-blue-500">
           Register Here
         </a>
       </p>

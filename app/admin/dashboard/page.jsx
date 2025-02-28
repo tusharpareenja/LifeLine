@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 import HospitalOverview from "./components/hospital_overview"
@@ -8,6 +8,8 @@ import DoctorManagement from "./components/doctor_management"
 import AmbulanceManagement from "./components/ambulance_management"
 import DiseaseInsights from "./components/disease_insight"
 import NotificationCenter from "./components/notification_center"
+import { auth } from "@/lib/auth"
+import { getSession, useSession } from "next-auth/react"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview")

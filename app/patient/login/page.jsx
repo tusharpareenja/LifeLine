@@ -1,4 +1,3 @@
-import Image from "next/image";
 import LoginForm from "@/app/Components/Login";
 import DarkModeToggle from "@/app/Components/DarkMode";
 import Logo from "@/app/Components/Logo";

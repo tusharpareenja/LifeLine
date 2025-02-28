@@ -10,11 +10,11 @@ export default function HeroSection({user}) {
         <CardContent className="pt-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={user.user.profilePic} alt={user.user.name} />
-              <AvatarFallback>{user.user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={user?.user?.profilePic} alt={user?.user?.name} />
+              <AvatarFallback>{user?.user?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-2xl font-bold">{user.user?.name}</h2>
+              <h2 className="text-2xl font-bold">{user?.user?.name}</h2>
               <p className="text-gray-500 dark:text-gray-400">Patient ID: {user.id}</p>
               <div className="mt-2 flex items-center">
                 <span className="text-sm font-medium mr-2">Health Score:</span>

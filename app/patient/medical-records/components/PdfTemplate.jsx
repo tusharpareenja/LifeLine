@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { chatSession } from '@/config/AiModel';
 
-const MedicalRecord = () => {
+const MedicalRecord = ({user}) => {
   // State for managing the overview data
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +31,7 @@ const MedicalRecord = () => {
       setIsLoading(true);
       try {
         const BASIC_PROMPT = `Generate a 100-word medical overview for a patient with the following details:
+        - Name: ${user.name}
         - Medications: Lisinopril 10mg daily, Albuterol inhaler as needed
         - Allergies: Penicillin (severe), Pollen (moderate)
         - Past Surgeries: Appendectomy (2015), Knee Arthroscopy (2018)`;

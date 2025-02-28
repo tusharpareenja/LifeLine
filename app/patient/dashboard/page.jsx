@@ -10,11 +10,6 @@ import {  Droplet, User } from 'lucide-react'
 import { getSession, useSession } from 'next-auth/react';
 import { getPatient } from '@/app/actions/actions';
 
-
-// Mock data
-
-
-
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
   { id: 2, doctor: 'Dr. Johnson', date: '2025-02-18', time: '2:30 PM' },
@@ -35,43 +30,29 @@ const recentMedicalReports = [
   { id: 2, title: 'X-Ray Report', date: '2025-01-28' },
 ];
 
-const user = {
-    name: "John Doe",
-    age: 35,
-    gender: "Male",
-    bloodType: "A+",
-    avatarUrl: {image}
-  }
-  
-  // In your JSX
-
-
-
 
 const WelcomeBanner = ({ user }) => (
- 
-
 
 <Card className="bg-blue-50 border-blue-200  dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={user.avatarUrl} alt={user.name} />
+          <AvatarImage src={user?.image ?? ""} alt={user?.name} />
           {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
         </Avatar>
         <div className="flex flex-col">
-          <h2 className="text-2xl font-bold">{user.user?.name}</h2>
+          <h2 className="text-2xl font-bold">{user?.user?.name}</h2>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {new Date(user.dob).toDateString()}
+              {new Date(user?.dob).toDateString()}
             </span>
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              {user.gender}
+              {user?.gender}
             </span>
             <span className="flex items-center gap-1">
               <Droplet className="w-4 h-4" />
-              {user.bloodType}
+              {user?.bloodType}
             </span>
           </div>
         </div>
@@ -361,6 +342,7 @@ const Dashboard = () => {
     const fetchPatientDetails = async () => {
       console.log(session)
       if (session && session.user.id) {
+        console.log(session.user)
         const patientData = await getPatient(session.user.patientId);
         console.log(patientData)
         setPatientDetails(patientData.data);
@@ -375,11 +357,8 @@ const Dashboard = () => {
      
 
       <main className="flex-1 p-8 ">
-<<<<<<< HEAD
-=======
         
 
->>>>>>> 0ef9ee02700e280a1bfcc3e33feeac4de47e189d
         {userType === 'patient' && (
           <>
             <WelcomeBanner user={user} />
