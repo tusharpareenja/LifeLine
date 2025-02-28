@@ -1,0 +1,322 @@
+// app/actions/appointment.ts
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { db } from "@/lib/db"; // Adjust import to your actual db setup
+import { auth } from "@/auth";
+
+// Create a new appointment
+export async function createAppointment(data) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Verify that patient exists
+    const patient = await db.patient.findUnique({
+      where: { id: data.patientId }
+    });
+
+    if (!patient) {
+      return { success: false, error: "Patient not found" };
+    }
+
+    // Verify that doctor exists
+    const doctor = await db.doctor.findUnique({
+      where: { id: data.doctorId }
+    });
+
+    if (!doctor) {
+      return { success: false, error: "Doctor not found" };
+    }
+
+    // Create appointment data
+    const appointmentData = {
+      appointmentDate: new Date(data.appointmentDate),
+      consultationType: data.consultationType,
+      patient: {
+        connect: { id: data.patientId }
+      },
+      doctor: {
+        connect: { id: data.doctorId }
+      }
+    };
+
+    // Add hospital if provided
+    if (data.hospitalId) {
+      const hospital = await db.hospital.findUnique({
+        where: { id: data.hospitalId }
+      });
+
+      if (!hospital) {
+        return { success: false, error: "Hospital not found" };
+      }
+
+      appointmentData.hospital = {
+        connect: { id: data.hospitalId }
+      };
+    } else {
+      // Use doctor's hospital if not provided
+      appointmentData.hospital = {
+        connect: { id: doctor.hospitalId }
+      };
+    }
+
+    const newAppointment = await db.appointment.create({
+      data: appointmentData
+    });
+
+    revalidatePath("/appointments");
+    revalidatePath(`/patients/${data.patientId}`);
+    revalidatePath(`/doctors/${data.doctorId}`);
+    return { success: true, data: newAppointment };
+  } catch (error) {
+    console.error("Failed to create appointment:", error);
+    return { success: false, error: "Failed to create appointment" };
+  }
+}
+
+// Get all appointments (with filtering options)
+export async function getAppointments(filter) {
+  try {
+    const where = {};
+    
+    if (filter?.patientId) {
+      where.patientId = filter.patientId;
+    }
+    
+    if (filter?.doctorId) {
+      where.doctorId = filter.doctorId;
+    }
+    
+    if (filter?.hospitalId) {
+      where.hospitalId = filter.hospitalId;
+    }
+    
+    if (filter?.status) {
+      where.status = filter.status;
+    }
+    
+    if (filter?.date) {
+      const date = new Date(filter.date);
+      const nextDay = new Date(date);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      where.appointmentDate = {
+        gte: date,
+        lt: nextDay
+      };
+    }
+
+    const appointments = await db.appointment.findMany({
+      where,
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: { name: true, email: true }
+            }
+          }
+        },
+        doctor: {
+          include: {
+            user: {
+              select: { name: true, email: true }
+            }
+          }
+        },
+        hospital: {
+          select: { id: true, name: true }
+        }
+      },
+      orderBy: {
+        appointmentDate: 'asc'
+      }
+    });
+    
+    return { success: true, data: appointments };
+  } catch (error) {
+    console.error("Failed to fetch appointments:", error);
+    return { success: false, error: "Failed to fetch appointments" };
+  }
+}
+
+// Get a single appointment by ID
+export async function getAppointmentById(id) {
+  try {
+    const appointment = await db.appointment.findUnique({
+      where: { id },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: { name: true, email: true }
+            }
+          }
+        },
+        doctor: {
+          include: {
+            user: {
+              select: { name: true, email: true, image: true }
+            }
+          }
+        },
+        hospital: true
+      }
+    });
+
+    if (!appointment) {
+      return { success: false, error: "Appointment not found" };
+    }
+
+    return { success: true, data: appointment };
+  } catch (error) {
+    console.error("Failed to fetch appointment:", error);
+    return { success: false, error: "Failed to fetch appointment" };
+  }
+}
+
+// Update appointment status
+// status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+
+export async function updateAppointmentStatus(
+  id,
+  status
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Fetch the appointment
+    const appointment = await db.appointment.findUnique({
+      where: { id },
+      include: {
+        doctor: {
+          select: { userId: true }
+        },
+        patient: {
+          select: { userId: true }
+        }
+      }
+    });
+
+    if (!appointment) {
+      return { success: false, error: "Appointment not found" };
+    }
+
+    // Check if user is the doctor or patient
+    if (appointment.doctor.userId !== session.user.id && 
+        appointment.patient.userId !== session.user.id) {
+      return { success: false, error: "Unauthorized to update this appointment" };
+    }
+
+    const updatedAppointment = await db.appointment.update({
+      where: { id },
+      data: { status }
+    });
+
+    revalidatePath(`/appointments/${id}`);
+    revalidatePath("/appointments");
+    return { success: true, data: updatedAppointment };
+  } catch (error) {
+    console.error("Failed to update appointment status:", error);
+    return { success: false, error: "Failed to update appointment status" };
+  }
+}
+
+// Reschedule appointment
+export async function rescheduleAppointment(
+  id,
+  newDate
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Fetch the appointment
+    const appointment = await db.appointment.findUnique({
+      where: { id },
+      include: {
+        doctor: {
+          select: { userId: true }
+        },
+        patient: {
+          select: { userId: true }
+        }
+      }
+    });
+
+    if (!appointment) {
+      return { success: false, error: "Appointment not found" };
+    }
+
+    // Check if user is the doctor or patient
+    if (appointment.doctor.userId !== session.user.id && 
+        appointment.patient.userId !== session.user.id) {
+      return { success: false, error: "Unauthorized to reschedule this appointment" };
+    }
+
+    const updatedAppointment = await db.appointment.update({
+      where: { id },
+      data: { 
+        appointmentDate: new Date(newDate),
+        status: 'SCHEDULED' // Reset to scheduled if it was cancelled
+      }
+    });
+
+    revalidatePath(`/appointments/${id}`);
+    revalidatePath("/appointments");
+    return { success: true, data: updatedAppointment };
+  } catch (error) {
+    console.error("Failed to reschedule appointment:", error);
+    return { success: false, error: "Failed to reschedule appointment" };
+  }
+}
+
+// Delete appointment
+export async function deleteAppointment(id) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Fetch the appointment
+    const appointment = await db.appointment.findUnique({
+      where: { id },
+      include: {
+        doctor: {
+          select: { userId: true }
+        },
+        patient: {
+          select: { userId: true }
+        }
+      }
+    });
+
+    if (!appointment) {
+      return { success: false, error: "Appointment not found" };
+    }
+
+    // Check if user is the doctor or patient
+    if (appointment.doctor.userId !== session.user.id && 
+        appointment.patient.userId !== session.user.id) {
+      return { success: false, error: "Unauthorized to delete this appointment" };
+    }
+
+    await db.appointment.delete({
+      where: { id }
+    });
+
+    revalidatePath("/appointments");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete appointment:", error);
+    return { success: false, error: "Failed to delete appointment" };
+  }
+}

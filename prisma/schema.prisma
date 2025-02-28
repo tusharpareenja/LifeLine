@@ -11,108 +11,32 @@ datasource db {
 
 
 model User {
-  id            String      @id @default(uuid())
-  name          String?
-  gid           String?
-  email         String?     @unique
-  emailVerified DateTime?
-  phone         String?     @unique @db.VarChar(20)
-  role          Role        @default(PATIENT)
-  profilePic    String?     @map("profile_pic")
-
-  // Relations 
+  id          String    @id @default(uuid()) @map("user_id")
+  name        String?
+  gid         String?
+  email       String    @unique
+  password    String    @map("password")
+  role        Role      @default(HOSPITAL)
+  image       String?   @map("image")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  // Relations
   accounts      Account[]
   sessions      Session[]
   authenticators Authenticator[]
 
   patient     Patient?
   doctor      Doctor?
+  hospital    Hospital?
   @@map("user")
-}
-
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String  @map("providerAccountId")
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  // Relations
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
-  @@map("account")
-}
-
-model Session {
-  sessionToken String   @id @map("sessionToken")
-  userId      String
-  expires     DateTime
-
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("session")
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-  @@map("verificationToken")
-}
-
-model Authenticator {
-  credentialID          String  @unique @map("credentialID")
-  userId               String  @map("userId")
-  providerAccountId    String  @map("providerAccountId")
-  credentialPublicKey  String  @map("credentialPublicKey")
-  counter              Int
-  credentialDeviceType String  @map("credentialDeviceType")
-  credentialBackedUp   Boolean @map("credentialBackedUp")
-  transports          String?
-
-  // Relations
-  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, credentialID])
-  @@map("authenticator")
-}
-
-enum Role {
-  PATIENT         @map("Patient")
-  DOCTOR          @map("Doctor")
-  ADMIN           @map("Admin")
-  HOSPITAL_ADMIN  @map("HospitalAdmin")
-}
-
-// 1. Hospital user Model
-model credentials {
-  id          String    @id @default(uuid()) @map("user_id")
-  email       String    @unique
-  password    String    @map("password")
-  phone       String?   @unique
-  role        Role      @default(PATIENT)
-  profilePic  String?   @map("profile_pic")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  
-  // Relations
-
-  @@map("credentials")
 }
 
 // 2. Patients Model
 model Patient {
   id              String    @id @default(uuid()) @map("patient_id")
   userId          String    @unique @map("user_id")
+  name            String
+  phone           String?   @unique
   dob             DateTime
   gender          Gender
   bloodType       BloodType?
@@ -123,6 +47,7 @@ model Patient {
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hospitals       Hospital[]
   medicalRecords  MedicalRecord[]
   familyHistory   FamilyHistory[]
   appointments    Appointment[]
@@ -136,14 +61,14 @@ model Patient {
 model Doctor {
   id              String    @id @default(uuid()) @map("doctor_id")
   userId          String    @unique @map("user_id")
+  hospitalId      String   @map("hospital_id")
   specialization  String?
-  hospitalId      String?   @map("hospital_id")
   experience      Int       @default(0)
   availability    Boolean   @default(true)
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+  hospital        Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
   medicalRecords  MedicalRecord[]
   appointments    Appointment[]
   prescriptions   Prescription[]
@@ -154,6 +79,7 @@ model Doctor {
 // 4. Hospitals Model
 model Hospital {
   id              String    @id @default(uuid()) @map("hospital_id")
+  userId          String    @unique @map("user_id")
   name            String
   address         String
   phone           String    @unique
@@ -164,7 +90,9 @@ model Hospital {
   createdAt       DateTime  @default(now()) @map("created_at")
 
   // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   doctors         Doctor[]
+  patients        Patient[]
   medicalRecords  MedicalRecord[]
   appointments    Appointment[]
   emergencyRequests EmergencyRequest[]
@@ -302,4 +230,77 @@ enum RequestStatus {
   PENDING    @map("Pending")
   ACCEPTED   @map("Accepted")
   REJECTED   @map("Rejected")
+}
+
+enum Role {
+  DOCTOR          @map("Doctor")
+  HOSPITAL        @map("Hospital")
+}
+
+
+
+
+
+
+
+// ----------------------------------------------------------------------------------------------------------
+
+
+
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String  @map("providerAccountId")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  // Relations
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("account")
+}
+
+model Session {
+  sessionToken String   @id @map("sessionToken")
+  userId      String
+  expires     DateTime
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verificationToken")
+}
+
+model Authenticator {
+  credentialID          String  @unique @map("credentialID")
+  userId               String  @map("userId")
+  providerAccountId    String  @map("providerAccountId")
+  credentialPublicKey  String  @map("credentialPublicKey")
+  counter              Int
+  credentialDeviceType String  @map("credentialDeviceType")
+  credentialBackedUp   Boolean @map("credentialBackedUp")
+  transports          String?
+
+  // Relations
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+  @@map("authenticator")
 }
