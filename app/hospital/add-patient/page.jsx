@@ -41,7 +41,7 @@ function App() {
             subject: 'Patient Account created succesfully !',
             text: `Your patient account has been created by ${result.data.hospitals[0].name}`,
             html: `<p>Your password is: <strong>${password}</strong></p>`
-        })
+          })
           fetchPatients();
         } else {
           toast.error(result.error || 'Failed to add patient');

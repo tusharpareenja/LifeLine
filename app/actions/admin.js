@@ -53,3 +53,17 @@ export const rejectHospital = async (id) => {
         return []
     }
 }
+export const getHospitalDetails = async (id) => {
+    try {
+        const res = await db.hospital.findUnique({
+            where : {
+                id
+            }
+        })
+        console.log(res);
+        return res
+    } catch (error) {
+        console.error(error);
+        return []
+    }
+}

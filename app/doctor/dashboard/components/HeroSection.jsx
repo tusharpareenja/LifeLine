@@ -10,9 +10,8 @@ import { getSession, useSession } from "next-auth/react"
 
 
 
-export default function HeroSection({ darkMode, setDarkMode }) {
+export default function HeroSection({ darkMode, setDarkMode , doctor}) {
   const [notifications, setNotifications] = useState(false)
-  const {data : session} = useSession()
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-teal-400 dark:from-blue-900 dark:to-teal-700 text-white py-6 px-4 rounded-b-3xl shadow-lg">
@@ -23,8 +22,8 @@ export default function HeroSection({ darkMode, setDarkMode }) {
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold">{session?.user?.name}</h1>
-            <p className="text-sm opacity-75">Cardiologist</p>
+            <h1 className="text-2xl font-bold">{doctor.name}</h1>
+            <p className="text-sm opacity-75">{doctor.specializations}</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">

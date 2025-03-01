@@ -3,7 +3,6 @@ import LoginForm from "../../Components/Login";
 import DarkModeToggle from "../../Components/DarkMode";
 import Logo from "../../Components/Logo";
 import AnimatedBackground from "../../Components/AnimatedBackground";
-import RegisterForm from "@/app/Components/Register";
 
 export default function Home() {
   return (
@@ -24,7 +23,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 transition-colors duration-200">
         <DarkModeToggle/>
         <Logo />
-        <RegisterForm role={"ADMIN"} />
+        <LoginForm role={"DOCTOR"}/>
       </div>
     </div>
   );

@@ -7,14 +7,16 @@ import NextAppointments from "./components/NextAppointments";
 import PatientManagement from "./components/PatientManagement";
 import AIInsights from "./components/AiInsight";
 import SmartActionsSidebar from "./components/SmartActionSidebar";
+import { getDoctorById } from "@/app/actions/doctors";
 
 export default function DoctorDashboard() {
   const [darkMode, setDarkMode] = useState(false);
+  const doctor = getDoctorById(sessionStorage.getItem("doctorId"))
 
   return (
     <div className={`min-h-screen ${darkMode ? "dark" : ""}`}>
       <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-900 dark:to-blue-900 min-h-screen">
-        <HeroSection darkMode={darkMode} setDarkMode={setDarkMode} />
+        <HeroSection darkMode={darkMode} setDarkMode={setDarkMode} doctor={doctor}/>
         <main className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <QuickOverview />

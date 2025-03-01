@@ -7,6 +7,7 @@ import db from "../db/db";
 // Create a new doctor
 export async function createDoctor(data) {
   try {
+    console.log(data)
     // Check if the hospital exists
     const hospital = await db.hospital.findUnique({
       where: { id: data.hospitalId }
@@ -15,6 +16,14 @@ export async function createDoctor(data) {
     if (!hospital) {
       return { success: false, error: "Hospital not found" };
     }
+    const user = await db.user.create({
+      data: {
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        role: "DOCTOR"
+      }
+    })
 
     const newDoctor = await db.doctor.create({
       data: {
@@ -23,7 +32,7 @@ export async function createDoctor(data) {
         availability: data.availability !== undefined ? data.availability : true,
         user: {
           connect: {
-            id: session.user.id
+            id: user.id
           }
         },
         hospital: {
@@ -31,6 +40,8 @@ export async function createDoctor(data) {
             id: data.hospitalId
           }
         }
+      }, include : {
+        user : true
       }
     });
 
@@ -86,36 +97,10 @@ export async function getDoctorById(id) {
     const doctor = await db.doctor.findUnique({
       where: { id },
       include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            image: true
-          }
-        },
+        user: true,
         hospital: true,
-        appointments: {
-          include: {
-            patient: {
-              include: {
-                user: {
-                  select: { name: true }
-                }
-              }
-            }
-          }
-        },
-        medicalRecords: {
-          include: {
-            patient: {
-              include: {
-                user: {
-                  select: { name: true }
-                }
-              }
-            }
-          }
-        }
+        appointments: true,
+        medicalRecords: true
       }
     });
 

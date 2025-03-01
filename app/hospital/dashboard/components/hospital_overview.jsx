@@ -4,22 +4,24 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { getHospitalDetails, getHospitalRequests } from "@/app/actions/admin"
 
 export default function HospitalOverview() {
   const [occupiedBeds, setOccupiedBeds] = useState(150)
   const [availableBeds, setAvailableBeds] = useState(50)
   const [icuCapacity, setIcuCapacity] = useState(75)
-  const [emergencyCases, setEmergencyCases] = useState(5)
+  const [ventilators, setVentilators] = useState(5)
+
+  const fetchDetails = async () => {
+    const res = await getHospitalDetails(sessionStorage.getItem("hospitalId"));
+    setOccupiedBeds(res.totalBeds - res.availableBeds);
+    setAvailableBeds(res.availableBeds);
+    setIcuCapacity(res.icuBeds);
+    setVentilators(res.ventilators);
+  }
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOccupiedBeds((prev) => Math.min(200, prev + Math.floor(Math.random() * 3)))
-      setAvailableBeds((prev) => Math.max(0, prev - Math.floor(Math.random() * 3)))
-      setIcuCapacity((prev) => Math.min(100, Math.max(0, prev + Math.floor(Math.random() * 5) - 2)))
-      setEmergencyCases((prev) => Math.max(0, prev + Math.floor(Math.random() * 3) - 1))
-    }, 5000)
-
-    return () => clearInterval(interval)
+    fetchDetails()
   }, [])
 
   return (
@@ -59,14 +61,14 @@ export default function HospitalOverview() {
             <Progress value={icuCapacity} className="h-2 bg-gray-700" />
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-gray-300">Emergency Cases:</span>
+            <span className="text-gray-300">Ventilators:</span>
             <motion.span
-              key={emergencyCases}
+              key={ventilators}
               initial={{ scale: 1.5, color: "#EF4444" }}
               animate={{ scale: 1, color: "#F87171" }}
               className="text-2xl font-bold"
             >
-              {emergencyCases}
+              {ventilators}
             </motion.span>
           </div>
         </div>

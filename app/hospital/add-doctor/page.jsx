@@ -4,10 +4,14 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { createDoctor } from '@/app/actions/doctors';
+import useSendEmail, { generatePassword } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function AddDoctor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { sendEmail } = useSendEmail()
   
   const { 
     register, 
@@ -25,10 +29,21 @@ export default function AddDoctor() {
     setIsSubmitting(true);
     try {
       console.log('Submitting doctor data:', data);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSubmitSuccess(true);
-      reset();
-      setTimeout(() => setSubmitSuccess(false), 3000);
+      const password = generatePassword(8)
+      const newData = {...data , password , hospitalId : sessionStorage.getItem("hospitalId")}
+      const res = await createDoctor(newData)
+      console.log(res)
+      if(res.success) {
+        toast.success("Doctor created succesfully !")
+        await sendEmail({
+            to: res.data.user.email,
+            subject: 'Patient Account created succesfully !',
+            text: `Your patient account has been created by admin`,
+            html: `<p>Your password is: <strong>${password}</strong></p>`
+        })
+      } else {
+        toast.error("Error while creating doctor !")
+      }
     } catch (error) {
       console.error('Error adding doctor:', error);
     } finally {
@@ -56,9 +71,14 @@ export default function AddDoctor() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="userName" className="block text-sm font-medium mb-2">Doctor Name <span className="text-red-500">*</span></label>
-                <input type="text" id="userName" {...register('userName', { required: 'Doctor name is required' })} className="w-full bg-black border border-gray-700 rounded-md px-4 py-2" placeholder="Enter doctor's name" />
-                {errors.userName && <p className="mt-1 text-red-500 text-sm">{errors.userName.message}</p>}
+                <label htmlFor="email" className="block text-sm font-medium mb-2">Doctor's Email <span className="text-red-500">*</span></label>
+                <input type="text" id="email" {...register('email', { required: 'Doctor name is required' })} className="w-full bg-black border border-gray-700 rounded-md px-4 py-2" placeholder="Enter doctor's email id" />
+                {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email.message}</p>}
+              </div>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium mb-2">Doctor Name <span className="text-red-500">*</span></label>
+                <input type="text" id="name" {...register('name', { required: 'Doctor name is required' })} className="w-full bg-black border border-gray-700 rounded-md px-4 py-2" placeholder="Enter doctor's name" />
+                {errors.name && <p className="mt-1 text-red-500 text-sm">{errors.name.message}</p>}
               </div>
               
               <div>
@@ -85,7 +105,7 @@ export default function AddDoctor() {
             </div>
             
             <div className="flex justify-end">
-              <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className={`px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-md font-medium text-black ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-neon-blue/30'}`}>
+              <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className={`px-6 py-3 bg-gray-800 from-neon-blue to-neon-purple rounded-md font-medium text-white ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-neon-blue/30'}`}>
                 {isSubmitting ? 'Adding Doctor...' : 'Add Doctor'}
               </motion.button>
             </div>
