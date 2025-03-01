@@ -106,11 +106,11 @@ const MedicalRecord = ({user}) => {
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Phone className="w-4 h-4 mr-2" />
-                    Contact: {user.user?.phone ?? "null"}
+                    Contact: {user?.phone ?? "null"}
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Mail className="w-4 h-4 mr-2" />
-                    Email: patient@example.com
+                    Email: {user?.user?.email}
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Home className="w-4 h-4 mr-2" />

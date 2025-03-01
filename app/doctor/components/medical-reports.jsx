@@ -9,9 +9,9 @@ import { Search, Upload, Download, AlertTriangle } from "lucide-react"
 
 // Mock data for medical reports
 const mockReports = [
-  { id: 1, patientName: "John Doe", type: "Blood Test", date: "2023-06-10", status: "Normal" },
-  { id: 2, patientName: "Jane Smith", type: "X-Ray", date: "2023-06-12", status: "Abnormal" },
-  { id: 3, patientName: "Mike Johnson", type: "MRI Scan", date: "2023-06-14", status: "Normal" },
+  { id: 1, patientName: "Karan", type: "Blood Test", date: "2023-06-10", status: "Normal" },
+  { id: 2, patientName: "Ram", type: "X-Ray", date: "2023-06-12", status: "Abnormal" },
+  { id: 3, patientName: "Johnny", type: "MRI Scan", date: "2023-06-14", status: "Normal" },
   // Add more mock data as needed
 ]
 

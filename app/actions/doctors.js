@@ -55,20 +55,16 @@ export async function createDoctor(data) {
 }
 
 // Get all doctors (with optional filtering)
-export async function getDoctors(filter) {
+export async function getDoctors() {
   try {
     const where = {};
     
-    if (filter?.hospitalId) {
-      where.hospitalId = filter.hospitalId;
-    }
     
-    if (filter?.specialization) {
-      where.specialization = filter.specialization;
-    }
+    
+  
 
     const doctors = await db.doctor.findMany({
-      where,
+      
       include: {
         user: {
           select: {

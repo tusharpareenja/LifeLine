@@ -10,16 +10,16 @@ import { Search, Grid, List } from "lucide-react";
 const patients = [
   {
     id: 1,
-    name: "Alice Johnson",
+    name: "Mayank Sharma",
     age: 35,
     condition: "Hypertension",
     lastVisit: "2023-05-15",
     status: "Active",
     vip: true,
   },
-  { id: 2, name: "Bob Smith", age: 42, condition: "Diabetes", lastVisit: "2023-05-10", status: "Follow-up" },
-  { id: 3, name: "Carol Williams", age: 28, condition: "Asthma", lastVisit: "2023-05-05", status: "Stable" },
-  { id: 4, name: "David Brown", age: 50, condition: "Arthritis", lastVisit: "2023-05-01", status: "Active" },
+  { id: 2, name: "Tushar Pareenja", age: 42, condition: "Diabetes", lastVisit: "2023-05-10", status: "Follow-up" },
+  { id: 3, name: "Rohit", age: 28, condition: "Asthma", lastVisit: "2023-05-05", status: "Stable" },
+  { id: 4, name: "Karan", age: 50, condition: "Arthritis", lastVisit: "2023-05-01", status: "Active" },
   {
     id: 5,
     name: "Eva Davis",

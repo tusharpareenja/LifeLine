@@ -7,20 +7,11 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import {  Droplet, User } from 'lucide-react'
 import { getPatientById } from '../../actions/patients.js';
+import { getDoctors } from "@/app/actions/doctors"
 
 const upcomingAppointments = [
-  { id: 1, doctor: 'Dr. Smith', date: '2025-02-15', time: '10:00 AM' },
-  { id: 2, doctor: 'Dr. Johnson', date: '2025-02-18', time: '2:30 PM' },
-];
-
-const hospitalBedAvailability = [
-  { hospital: 'City General Hospital', availableBeds: 15 },
-  { hospital: "St. Mary's Medical Center", availableBeds: 8 },
-];
-
-const doctorRecommendations = [
-  { id: 1, name: 'Dr. Emily Chen', specialization: ['Cardiologist'] },
-  { id: 2, name: 'Dr. Michael Lee', specialization: ['Neurologist'] },
+  { id: 1, doctor: 'Dr. Souravv', date: '2025-02-15', time: '10:00 AM' },
+  { id: 2, doctor: 'KRIPA', date: '2025-02-18', time: '2:30 PM' },
 ];
 
 const recentMedicalReports = [
@@ -29,73 +20,102 @@ const recentMedicalReports = [
 ];
 
 const WelcomeBanner = ({ user }) => (
-
-<Card className="bg-blue-50 border-blue-200  dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar className="w-16 h-16">
-          <AvatarImage src={user?.image ?? ""} alt={user?.name} />
-          {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
-        </Avatar>
-        <div className="flex flex-col">
-          <h2 className="text-2xl font-bold">{user?.user?.name}</h2>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              {new Date(user?.dob).toDateString()}
-            </span>
-            <span className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              {user?.gender}
-            </span>
-            <span className="flex items-center gap-1">
-              <Droplet className="w-4 h-4" />
-              {user?.bloodType}
-            </span>
-          </div>
+  <Card className="bg-blue-50 border-blue-200 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <CardHeader className="flex flex-row items-center gap-4">
+      <Avatar className="w-16 h-16">
+        <AvatarImage src={user?.image ?? ""} alt={user?.name} />
+        {/* <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback> */}
+      </Avatar>
+      <div className="flex flex-col">
+        <h2 className="text-2xl font-bold">{user?.name}</h2>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Calendar className="w-4 h-4" />
+            {user?.dob ? new Date(user.dob).toDateString() : 'N/A'}
+          </span>
+          <span className="flex items-center gap-1">
+            <User className="w-4 h-4" />
+            {user?.gender || 'N/A'}
+          </span>
+          <span className="flex items-center gap-1">
+            <Droplet className="w-4 h-4" />
+            {user?.bloodType || 'N/A'}
+          </span>
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">
-          Here's your daily health tip: Stay hydrated by drinking at least 8 glasses of water today.
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <p className="text-sm text-muted-foreground">
+        Here's your daily health tip: Stay hydrated by drinking at least 8 glasses of water today.
+      </p>
+    </CardContent>
+  </Card>
 );
 
-const UpcomingAppointments = ({ appointments }) => (
+const UpcomingAppointments = ({ appointments = [] }) => (
   <Card>
     <CardHeader>
       <CardTitle>Upcoming Appointments</CardTitle>
     </CardHeader>
     <CardContent>
-      <ul className="space-y-2">
-        {appointments?.map((appointment) => (
-          <li key={appointment.id} className="flex justify-between items-center">
-            <span>{appointment.doctor}</span>
-            <span className="text-sm text-gray-500">
-              {appointment.date}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {appointments.length > 0 ? (
+        <ul className="space-y-2">
+          {appointments.map((appointment) => (
+            <li key={appointment.id} className="flex justify-between items-center">
+              <span>{appointment.doctor}</span>
+              <span className="text-sm text-gray-500">
+                {appointment.date}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No upcoming appointments scheduled.</p>
+      )}
     </CardContent>
   </Card>
 );
 
-const HospitalBedAvailability = ({ hospitals }) => (
+const HospitalBedAvailability = ({ hospitals = [] }) => (
   <Card>
     <CardHeader>
       <CardTitle>Hospital & Bed Availability</CardTitle>
     </CardHeader>
     <CardContent>
-      <ul className="space-y-2">
-        {hospitals?.map((hospital, index) => (
-          <li key={index} className="flex justify-between items-center">
-            <span>{hospital.hospital}</span>
-            <span className="font-bold text-green-600">{hospital.availableBeds} beds</span>
-          </li>
-        ))}
-      </ul>
+      {hospitals.length > 0 ? (
+        <ul className="space-y-4">
+          {hospitals.map((hospital) => (
+            <li key={hospital.id} className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">{hospital.name}</span>
+                <span className="font-bold text-green-600">{hospital.availableBeds} beds available</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Total Beds:</span>
+                  <span>{hospital.totalBeds}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>ICU Beds:</span>
+                  <span>{hospital.icuBeds}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Ventilators:</span>
+                  <span>{hospital.ventilators}</span>
+                </div>
+                <div className="w-full mt-1">
+                  <Progress 
+                    value={(hospital.availableBeds / hospital.totalBeds) * 100} 
+                    className="h-2"
+                  />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No hospital data available.</p>
+      )}
     </CardContent>
   </Card>
 );
@@ -106,61 +126,68 @@ const EmergencyServices = () => (
       <CardTitle>Emergency Services</CardTitle>
     </CardHeader>
     <CardContent className="flex flex-col space-y-2">
-    <Button
-  variant="destructive"
-  onClick={() => window.location.href = "tel:112"}
->
-  112 Emergency
-</Button>
+      <Button
+        variant="destructive"
+        onClick={() => window.location.href = "tel:112"}
+      >
+        112 Emergency
+      </Button>
 
-<Button
-  onClick={() => window.open("https://medulance.com/", "_blank")}
->
-  Book Ambulance
-</Button>
+      <Button
+        onClick={() => window.open("https://medulance.com/", "_blank")}
+      >
+        Book Ambulance
+      </Button>
 
-<Button
-  onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
->
-  Find Blood Banks
-</Button>
-
+      <Button
+        onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
+      >
+        Find Blood Banks
+      </Button>
     </CardContent>
   </Card>
 );
 
-const DoctorRecommendations = ({ doctors }) => (
+const DoctorRecommendations = ({ doctors = [] }) => (
   <Card>
     <CardHeader>
       <CardTitle>Recommended Doctors</CardTitle>
     </CardHeader>
     <CardContent>
-      <ul className="space-y-2">
-        {doctors?.map((doctor) => (
-          <li key={doctor.id} className="flex justify-between items-center">
-            <span>{doctor.name}</span>
-            <span className="text-sm text-gray-500">{doctor.specialization}</span>
-          </li>
-        ))}
-      </ul>
+      {doctors.length > 0 ? (
+        <ul className="space-y-2">
+          {doctors.map((doctor) => (
+            <li key={doctor.id} className="flex justify-between items-center">
+              <span>{doctor.user?.name || 'Unknown Doctor'}</span>
+              <span className="text-sm text-gray-500">{doctor.specialization}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No doctor recommendations available yet.</p>
+      )}
     </CardContent>
   </Card>
 );
 
-const RecentMedicalReports = ({ reports }) => (
+const RecentMedicalReports = ({ reports = [] }) => (
   <Card>
     <CardHeader>
       <CardTitle>Recent Medical Reports</CardTitle>
     </CardHeader>
     <CardContent>
-      <ul className="space-y-2">
-        {reports.map((report) => (
-          <li key={report.id} className="flex justify-between items-center">
-            <span>{report.title}</span>
-            <span className="text-sm text-gray-500">{report.date}</span>
-          </li>
-        ))}
-      </ul>
+      {reports.length > 0 ? (
+        <ul className="space-y-2">
+          {reports.map((report) => (
+            <li key={report.id} className="flex justify-between items-center">
+              <span>{report.title}</span>
+              <span className="text-sm text-gray-500">{report.date}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No recent medical reports available.</p>
+      )}
     </CardContent>
   </Card>
 );
@@ -332,34 +359,63 @@ const AnalyticsReports = () => (
 
 const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
-  const [user, setPatientDetails] = useState({});
+  const [patientData, setPatientData] = useState(null);
+  const [doctorList, setDoctorList] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await getDoctors();
+        if (res && res.data) {
+          setDoctorList(res.data);
+          console.log("Doctors data:", res.data);
+        }
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
-      const patientData = await getPatientById(sessionStorage.getItem("patientId"));
-      console.log(patientData)
-      setPatientDetails(patientData.data);
+      try {
+        const patientId = sessionStorage.getItem("patientId");
+        console.log("Fetching patient details with ID:", patientId);
+        
+        const response = await getPatientById(patientId);
+        console.log("Patient data structure:", JSON.stringify(response, null, 2));
+        
+        if (response && response.success && response.data) {
+          setPatientData(response.data);
+        } else {
+          console.error("Failed to fetch patient data or invalid data structure");
+        }
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+      }
     };
+    
     fetchPatientDetails();
   }, []);
-  
+
+  // Extract data for components
+  const hospitals = patientData?.hospitals || [];
+  const appointments = patientData?.appointments || upcomingAppointments; // Fallback to dummy data if none available
+  const medicalRecords = patientData?.medicalRecords || recentMedicalReports; // Fallback to dummy data if none available
 
   return (
-    <div className="flex h-screen  bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-     
-
-      <main className="flex-1 p-8 ">
-        
-
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <main className="flex-1 p-8">
         {userType === 'patient' && (
           <>
-            <WelcomeBanner user={user} />
+            <WelcomeBanner user={patientData} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <UpcomingAppointments appointments={user.appointments} /> 
-              <HospitalBedAvailability hospitals={user.hospitals} />
+              <UpcomingAppointments appointments={upcomingAppointments} /> 
+              <HospitalBedAvailability hospitals={hospitals} />
               <EmergencyServices />
-              <DoctorRecommendations doctors={user.doctors} />
-              <RecentMedicalReports reports={recentMedicalReports} />
+              <DoctorRecommendations doctors={doctorList} />
+              <RecentMedicalReports reports={medicalRecords} />
             </div>
           </>
         )}
@@ -391,6 +447,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
 
 export default Dashboard;

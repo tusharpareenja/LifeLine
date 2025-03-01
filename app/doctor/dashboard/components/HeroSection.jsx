@@ -22,14 +22,14 @@ export default function HeroSection({ darkMode, setDarkMode , doctor}) {
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold">{doctor.name}</h1>
-            <p className="text-sm opacity-75">{doctor.specializations}</p>
+            <h1 className="text-2xl font-bold">{doctor?.user?.name}</h1>
+            <p className="text-sm opacity-75">{doctor?.specialization}</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Globe className="h-5 w-5" />
-            <span>New York, NY</span>
+            <span>India</span>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setNotifications(!notifications)}>
             <Bell className="h-5 w-5" />

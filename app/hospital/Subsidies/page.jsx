@@ -1,3 +1,4 @@
+'use client'
 import { CollapsibleSection } from "./components/collapsible-section"
 import { Header } from "./components/header"
 import { StatusBadge } from "./components/status-badge"

@@ -11,7 +11,7 @@ import { Calendar, Search, Download, Check, X, Clock } from "lucide-react"
 const mockAppointments = [
   {
     id: 1,
-    patientName: "John Doe",
+    patientName: "Sachin",
     date: "2023-06-15",
     time: "10:00 AM",
     symptoms: "Headache, Fever",
@@ -19,7 +19,7 @@ const mockAppointments = [
   },
   {
     id: 2,
-    patientName: "Jane Smith",
+    patientName: "Ram",
     date: "2023-06-15",
     time: "11:30 AM",
     symptoms: "Cough, Sore throat",
@@ -27,7 +27,7 @@ const mockAppointments = [
   },
   {
     id: 3,
-    patientName: "Mike Johnson",
+    patientName: "Rohan",
     date: "2023-06-16",
     time: "2:00 PM",
     symptoms: "Back pain",

@@ -18,8 +18,8 @@ export default function UserRolesPage() {
         <div className="flex justify-center items-center h-full">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 hover:cursor-pointer">
             {/* Use Link for direct navigation */}
-            <Link href="/login/admin">
-              <RoleCard icon={<UserCog size={48} />} title="Admin" />
+            <Link href="/login/hospital">
+              <RoleCard icon={<UserCog size={48} />} title="Hospital" />
             </Link>
 
             <Link href="/login/patient">

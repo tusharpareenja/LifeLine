@@ -114,7 +114,7 @@ export default function Dashboard() {
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
               <div>
-                <h2 className="text-2xl font-bold">Welcome, Patient</h2>
+                <h2 className="text-2xl font-bold">Welcome</h2>
                 <p className="text-muted-foreground">Manage your healthcare credits</p>
               </div>
               <div className="bg-primary/10 px-4 py-3 rounded-lg">

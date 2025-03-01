@@ -4,23 +4,32 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PdfTemplate from "../components/PdfTemplate";
 import { useSession } from "next-auth/react";
-import { getPatient } from "@/app/actions/actions";
+import { getPatientById } from "@/app/actions/patients"
 
 const MedicalRecord = () => {
   const recordRef = useRef(null);
-  const [user, setPatientDetails] = useState({});
-  const { data: session } = useSession(); 
+  const [user, setPatientData] = useState({});
   useEffect(() => {
-      const fetchPatientDetails = async () => {
-        console.log(session)
-        if (session && session.user.id) {
-          const patientData = await getPatient(session.user.patientId);
-          console.log(patientData)
-          setPatientDetails(patientData.data);
+    const fetchPatientDetails = async () => {
+      try {
+        const patientId = sessionStorage.getItem("patientId");
+        console.log("Fetching patient details with ID:", patientId);
+        
+        const response = await getPatientById(patientId);
+        console.log("Patient data structure:", JSON.stringify(response, null, 2));
+        
+        if (response && response.success && response.data) {
+          setPatientData(response.data);
+        } else {
+          console.error("Failed to fetch patient data or invalid data structure");
         }
-      };
-      fetchPatientDetails();
-    }, [session]);
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+      }
+    };
+    
+    fetchPatientDetails();
+  }, []);
 
   const downloadPDF = () => {
     const input = recordRef.current;

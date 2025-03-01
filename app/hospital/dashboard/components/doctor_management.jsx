@@ -1,40 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. John Doe",
-    status: "available",
-    activeCases: 3,
-    pendingConsultations: 2,
-    image: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 2,
-    name: "Dr. Jane Smith",
-    status: "busy",
-    activeCases: 5,
-    pendingConsultations: 1,
-    image: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 3,
-    name: "Dr. Mike Johnson",
-    status: "emergency",
-    activeCases: 2,
-    pendingConsultations: 0,
-    image: "/placeholder.svg?height=32&width=32",
-  },
-]
+import { getDoctors } from "@/app/actions/doctors"
 
 export default function DoctorManagement() {
   const [expandedDoctor, setExpandedDoctor] = useState(null)
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await getDoctors();
+        setDoctors(res.data);
+        console.log(res);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -55,61 +43,64 @@ export default function DoctorManagement() {
         <CardTitle className="text-2xl font-bold text-blue-400">Doctor Management</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
-          {doctors.map((doctor) => (
-            <motion.li
-              key={doctor.id}
-              layoutId={`doctor-${doctor.id}`}
-              onClick={() => setExpandedDoctor(expandedDoctor === doctor.id ? null : doctor.id)}
-              className="cursor-pointer"
-            >
-              <Card className="bg-gray-700 hover:bg-gray-600 transition-colors duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarImage src={doctor.image} alt={doctor.name} />
-                        <AvatarFallback>
-                          {doctor.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold text-white">{doctor.name}</h3>
-                        <Badge variant="outline" className={`${getStatusColor(doctor.status)} text-white`}>
-                          {doctor.status}
-                        </Badge>
+        {doctors.length === 0 ? (
+          <p className="text-gray-300 text-center">No doctors available</p>
+        ) : (
+          <ul className="space-y-4">
+            {doctors.map((doctor) => (
+              <motion.li
+                key={doctor.id}
+                layoutId={`doctor-${doctor.id}`}
+                onClick={() => setExpandedDoctor(expandedDoctor === doctor.id ? null : doctor.id)}
+                className="cursor-pointer"
+              >
+                <Card className="bg-gray-700 hover:bg-gray-600 transition-colors duration-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <Avatar>
+                          <AvatarImage src={doctor.image} alt={doctor.name} />
+                          <AvatarFallback>
+                            {doctor.user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold text-white">{doctor.user.name}</h3>
+                          {/* <Badge className={`${getStatusColor(doctor.status)} text-white`}>
+                            {doctor.status}
+                          </Badge> */}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-300">{doctor.specialization}</p>
+                        <p className="text-sm text-gray-300">Experience: {doctor.experience} years</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-300">Active Cases: {doctor.activeCases}</p>
-                      <p className="text-sm text-gray-300">Pending: {doctor.pendingConsultations}</p>
-                    </div>
-                  </div>
-                  <AnimatePresence>
-                    {expandedDoctor === doctor.id && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-4 pt-4 border-t border-gray-600"
-                      >
-                        <p className="text-sm text-gray-300">Specialty: Cardiology</p>
-                        <p className="text-sm text-gray-300">Years of Experience: 10</p>
-                        <p className="text-sm text-gray-300">Next Available Slot: Today, 3:00 PM</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
-            </motion.li>
-          ))}
-        </ul>
+                    <AnimatePresence>
+                      {expandedDoctor === doctor.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-4 pt-4 border-t border-gray-600"
+                        >
+                          <p className="text-sm text-gray-300">Specialty: {doctor.specialization}</p>
+                          <p className="text-sm text-gray-300">Years of Experience: {doctor.experience}</p>
+                          <p className="text-sm text-gray-300">Next Available Slot: {doctor.nextAvailableSlot}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
+              </motion.li>
+            ))}
+          </ul>
+        )}
       </CardContent>
     </Card>
   )
 }
-

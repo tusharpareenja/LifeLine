@@ -16,23 +16,32 @@ import QuickActions from "./components/QuickActions"
 import CategorizedMedicalRecords from "./components/CategorizedMedicalRecords"
 import EmergencyHealthSummary from "./components/EmergencyHealthSummary"
 import { useSession } from "next-auth/react"
-import { getPatients } from "../../actions/patients"
+import { getPatientById } from "@/app/actions/patients"
 
 export default function MedicalHistory() {
   const [darkMode, setDarkMode] = React.useState(false)
-  const [user, setPatientDetails] = useState({});
-  const { data: session } = useSession(); 
+  const [user, setPatientData] = useState({});
   useEffect(() => {
-      const fetchPatientDetails = async () => {
-        console.log(session)
-        if (session && session.user.id) {
-          const patientData = await getPatient(session.user.patientId);
-          console.log(patientData)
-          setPatientDetails(patientData.data);
+    const fetchPatientDetails = async () => {
+      try {
+        const patientId = sessionStorage.getItem("patientId");
+        console.log("Fetching patient details with ID:", patientId);
+        
+        const response = await getPatientById(patientId);
+        console.log("Patient data structure:", JSON.stringify(response, null, 2));
+        
+        if (response && response.success && response.data) {
+          setPatientData(response.data);
+        } else {
+          console.error("Failed to fetch patient data or invalid data structure");
         }
-      };
-      fetchPatientDetails();
-    }, [session]);
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+      }
+    };
+    
+    fetchPatientDetails();
+  }, []);
 
   React.useEffect(() => {
     if (darkMode) {

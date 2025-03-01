@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { MessageSquare, Phone } from "lucide-react"
 
 const appointments = [
-  { id: 1, name: "Alice Johnson", time: "10:00 AM", status: "Confirmed" },
-  { id: 2, name: "Bob Smith", time: "11:30 AM", status: "Pending" },
-  { id: 3, name: "Carol Williams", time: "2:00 PM", status: "Urgent" },
+  { id: 1, name: "Mayank Sharma", time: "10:00 AM", status: "Confirmed" },
+  { id: 2, name: "Tushar Pareenja", time: "11:30 AM", status: "Pending" },
+  { id: 3, name: "Karan Tejpal", time: "2:00 PM", status: "Urgent" },
   { id: 4, name: "David Brown", time: "3:30 PM", status: "Confirmed" },
 ]
 
