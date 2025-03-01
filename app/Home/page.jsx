@@ -195,14 +195,19 @@ function App() {
               </motion.button>
               
               </Link>
-              
+              <Link href={'/HospitalRequestForm'}>
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700"
               >
-                Watch Demo
+                Register Hospital
               </motion.button>
+              
+              </Link>
+              
+              
             </motion.div>
           </div>
           
