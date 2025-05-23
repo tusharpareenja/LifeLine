@@ -38,7 +38,7 @@ const LoginForm = ({role}) => {
         role === "HOSPITAL" ? sessionStorage.setItem("hospitalId" , res.data.hospital.id) : role === "PATIENT" ? sessionStorage.setItem("patientId" , res.data.patient.id) : role === "DOCTOR" ? sessionStorage.setItem("doctorId" , res.data.doctor.id) : null
         role === "HOSPITAL" ? router.push("/hospital/dashboard") : role === "PATIENT" ? router.push("/patient/dashboard") : role === "DOCTOR" ? router.push("/doctor/dashboard") : null
       } else {
-        // Login failed
+        
         toast.error("Login failed")
       }
     } catch(err){
