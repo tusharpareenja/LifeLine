@@ -1,11 +1,23 @@
 'use client'
+import { useEffect, useState } from "react";
 import { CollapsibleSection } from "./components/collapsible-section"
 import { Header } from "./components/header"
 import { StatusBadge } from "./components/status-badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { getPatientsWithSubsidy } from "@/app/actions/patients";
 
 export default function Dashboard() {
+  const [patients, setPatients] = useState([]);
+  useEffect(() => {
+    async function fetchPatients() {
+      const res = await getPatientsWithSubsidy();
+      if (res.success) setPatients(res.data);
+      console.log(res.data);
+    }
+    fetchPatients();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -50,54 +62,24 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-border">
-                        <td className="p-4">Rahul Verma</td>
-                        <td className="p-4">Heart Disease</td>
-                        <td className="p-4">Ayushman Bharat</td>
-                        <td className="p-4">
-                          <StatusBadge status="Pending" />
-                        </td>
-                        <td className="p-4 text-right">
-                          <Button variant="outline" size="sm" className="mr-2">
-                            Edit
-                          </Button>
-                          <Button variant="destructive" size="sm">
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                      <tr className="border-b border-border">
-                        <td className="p-4">Meena Sharma</td>
-                        <td className="p-4">Cancer</td>
-                        <td className="p-4">State Govt Cancer Fund</td>
-                        <td className="p-4">
-                          <StatusBadge status="Approved" variant="success" />
-                        </td>
-                        <td className="p-4 text-right">
-                          <Button variant="outline" size="sm" className="mr-2">
-                            Edit
-                          </Button>
-                          <Button variant="destructive" size="sm">
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-4">Amit Kumar</td>
-                        <td className="p-4">Kidney Failure</td>
-                        <td className="p-4">PMJAY Dialysis</td>
-                        <td className="p-4">
-                          <StatusBadge status="Pending" />
-                        </td>
-                        <td className="p-4 text-right">
-                          <Button variant="outline" size="sm" className="mr-2">
-                            Edit
-                          </Button>
-                          <Button variant="destructive" size="sm">
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
+                      {patients.map((patient) => (
+                        <tr key={patient.id} className="border-b border-border">
+                          <td className="p-4">{patient.name}</td>
+                          <td className="p-4">{patient.medicalIssue || "-"}</td>
+                          <td className="p-4">{patient.subsidyType || "-"}</td>
+                          <td className="p-4">
+                            <StatusBadge status={patient.hasSubsidy === "Yes" ? "Pending" : "None"} />
+                          </td>
+                          <td className="p-4 text-right">
+                            <Button variant="outline" size="sm" className="mr-2">
+                              Edit
+                            </Button>
+                            <Button variant="destructive" size="sm">
+                              Remove
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

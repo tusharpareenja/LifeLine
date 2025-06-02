@@ -8,17 +8,39 @@ import DoctorSearch from "../patient/components/doctor-section";
 // Create a new patient
 export async function createPatient(data) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const validBloodTypes = [
+      "A_POSITIVE", "A_NEGATIVE",
+      "B_POSITIVE", "B_NEGATIVE",
+      "AB_POSITIVE", "AB_NEGATIVE",
+      "O_POSITIVE", "O_NEGATIVE"
+    ];
+
+    // Ensure all additional fields are passed as strings (empty string if missing)
     const newPatient = await db.patient.create({
       data: {
         name: data.name,
         phone: data.phone,
         dob: new Date(data.dob),
         gender: data.gender,
-        bloodType: data.bloodType , // Cast to enum
-        allergy: data.allergy,
-        surgery: data.surgery,
-        medicalIssue: data.medicalIssue,
-        emergencyContact: data.emergencyContact,
+        bloodType: validBloodTypes.includes(data.bloodType) ? data.bloodType : undefined,
+        allergy: data.allergy ?? "",
+        surgery: data.surgery ?? "",
+        medicalIssue: data.medicalIssue ?? "",
+        emergencyContact: data.emergencyContact ?? "",
+        yearlyIncome: data.yearlyIncome ?? "",
+        geneticDiseases: data.geneticDiseases ?? "",
+        longTermMedication: data.longTermMedication ?? "",
+        hasSubsidy: typeof data.hasSubsidy === "boolean"  ?? "",
+        subsidyType: data.subsidyType ?? "",
+        subsidyDetails: data.subsidyDetails ?? "",
+                city: data.city ?? "",
+        address: data.address ?? "",
+        state: data.state ?? "",
         user: {
           connect: {
             id: session.user.id
@@ -27,6 +49,7 @@ export async function createPatient(data) {
       }
     });
 
+    console.log(newPatient);
     revalidatePath("/patients");
     return { success: true, data: newPatient };
   } catch (error) {
@@ -207,3 +230,38 @@ export async function addPatientToHospital(patientId, hospitalId) {
     return { success: false, error: "Failed to add patient to hospital" };
   }
 }
+
+// Get patients with subsidy
+export async function getPatientsWithSubsidy() {
+  try {
+    const patients = await db.patient.findMany({
+      where: {
+        hasSubsidy: true
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true
+          }
+        },
+        hospitals: true
+      }
+    });
+
+    if (!patients || patients.length === 0) {
+      return {
+        success: true,
+        data: [],
+        message: "No patients with subsidy found"
+      };
+    }
+
+    console.log(patients);
+    return { success: true, data: patients };
+  } catch (error) {
+    console.error("Failed to fetch patients with subsidy:", error);
+    return { success: false, error: "Failed to fetch patients with subsidy" };
+  }
+}
+

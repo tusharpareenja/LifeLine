@@ -31,9 +31,11 @@ export const registerHospital = async (additionalData) => {
             availableBeds: additionalData.availableBeds,
             icuBeds: additionalData.icuBeds,
             ventilators: additionalData.ventilators,
-          },
-        },
-      },
+            latitude: additionalData.latitude,
+            longitude: additionalData.longitude
+          }
+        }
+      }
     });
 
     // revalidatePath("/hospitals");
@@ -97,6 +99,16 @@ export async function createPatient({data, hospitalId}) {
         surgery: data.surgery,
         medicalIssue: data.medicalIssue,
         emergencyContact: data.emergencyContact,
+        yearlyIncome: data.yearlyIncome ?? "",
+        geneticDiseases: data.geneticDiseases ?? "",
+        longTermMedication: data.longTermMedication ?? "",
+        hasSubsidy: data.hasSubsidy === "Yes" ? true : false,
+        subsidyType: data.subsidyType ?? "",
+        subsidyDetails: data.subsidyDetails ?? "",
+        city: data.city ?? "",
+        address: data.address ?? "",
+        state: data.state ?? "",
+        
         user: {
           connect: {
             id: newUser.id, // Connect to the newly created user
@@ -291,4 +303,43 @@ export async function addPatientToHospital(patientId, hospitalId) {
     console.error("Failed to add patient to hospital:", error);
     return { success: false, error: "Failed to add patient to hospital" };
   }
+}
+
+// Get nearby hospitals within a certain distance (in km) from a given lat/lng
+export async function getNearbyHospitals(latitude, longitude, distanceKm = 10) {
+  // Haversine formula in raw SQL for Postgres
+  // Returns hospitals with distance in km
+  const hospitals = await db.$queryRaw`
+    SELECT id, name, address, latitude, longitude,
+      available_beds, total_beds, icu_beds, ventilators,
+      (6371 * acos(
+        cos(radians(${latitude})) *
+        cos(radians(latitude)) *
+        cos(radians(longitude) - radians(${longitude})) +
+        sin(radians(${latitude})) *
+        sin(radians(latitude))
+      )) AS distance
+    FROM "hospitals"
+    WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+      AND (6371 * acos(
+        cos(radians(${latitude})) *
+        cos(radians(latitude)) *
+        cos(radians(longitude) - radians(${longitude})) +
+        sin(radians(${latitude})) *
+        sin(radians(latitude))
+      )) < ${distanceKm}
+    ORDER BY distance ASC
+    LIMIT 50;
+  `;
+  // Return all relevant fields for frontend, mapping snake_case to camelCase
+  return hospitals.map(h => ({
+    id: h.id,
+    name: h.name,
+    address: h.address,
+    distance: h.distance,
+    availableBeds: h.available_beds,
+    totalBeds: h.total_beds,
+    icuBeds: h.icu_beds,
+    ventilators: h.ventilators
+  }));
 }

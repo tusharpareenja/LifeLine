@@ -3,6 +3,10 @@ import React, { useState } from "react";
 import { Building2, Activity, ArrowLeft, MapPin, Phone, Mail, Bed, User, Lock } from "lucide-react";
 import { registerHospital } from "@/app/actions/hospitals";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+const MapLibreMap = dynamic(() => import("@/app/HospitalRequestForm/MapLibreMap"), { ssr: false });
 
 const initialFormData = {
   email: "",
@@ -15,6 +19,8 @@ const initialFormData = {
   icuBeds: 0,
   ventilators: 0,
   contactName: "",
+  latitude: null,
+  longitude: null,
 };
 
 function HospitalRequestForm() {
@@ -310,7 +316,11 @@ function HospitalRequestForm() {
                       id="address"
                       name="address"
                       value={formData.address}
-                      onChange={handleChange}
+                      onChange={async (e) => {
+                        handleChange(e);
+                        // Two-way sync: update map when address changes
+                        // (MapLibreMap will handle this via props)
+                      }}
                       className={`pl-10 block w-full rounded-md border ${
                         errors.address ? "border-red-300" : "border-gray-300"
                       } shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
@@ -318,6 +328,21 @@ function HospitalRequestForm() {
                     />
                   </div>
                   {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Pin Hospital Location on Map</label>
+                    <div className="h-64 rounded-lg overflow-hidden border border-blue-200">
+                      <MapLibreMap
+                        latitude={formData.latitude}
+                        longitude={formData.longitude}
+                        address={formData.address}
+                        onLocationChange={(lat, lng) => setFormData({ ...formData, latitude: lat, longitude: lng })}
+                        onAddressChange={(addr) => setFormData((prev) => ({ ...prev, address: addr }))}
+                      />
+                    </div>
+                    {formData.latitude && formData.longitude && (
+                      <div className="text-xs text-gray-600 mt-2">Selected: {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}</div>
+                    )}
+                  </div>
                 </div>
 
                 <div>

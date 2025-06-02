@@ -40,6 +40,9 @@ model Patient {
   gender          Gender
   bloodType       BloodType?
   allergy         String?
+  state         String?
+  city            String?
+  address         String?
   surgery         String?
   medicalIssue    String?   @map("medical_issue")
   emergencyContact String?  @map("emergency_contact")
@@ -53,6 +56,16 @@ model Patient {
   appointments    Appointment[]
   emergencyRequests EmergencyRequest[]
   prescriptions   Prescription[]
+
+  // Additional Medical Information
+  yearlyIncome      String?
+  geneticDiseases   String?
+  longTermMedication String?
+
+  // Subsidy Information
+   hasSubsidy       Boolean?
+  subsidyType       String?
+  subsidyDetails    String?
 
   @@map("patients")
 }
@@ -83,6 +96,8 @@ model Hospital {
   userId          String    @unique
   name            String
   address         String
+  latitude       Float?     @map("latitude")
+  longitude      Float?     @map("longitude")
   pending         Boolean   @default(true)
   approved        Boolean   @default(false)
   phone           String    @unique

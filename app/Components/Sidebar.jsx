@@ -104,6 +104,20 @@ const Sidebar = () => {
                 <span>Insurance</span>
               </a>
             </li>
+                        <li>
+              <a
+                href="#"
+                className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/patient/subsidies'; 
+                  setIsOpen(false);
+                }}
+              >
+                <IndianRupee className="w-5 h-5 mr-3" />
+                <span>Subsidies</span>
+              </a>
+            </li>
             <li>
               <a
                 href="#"
