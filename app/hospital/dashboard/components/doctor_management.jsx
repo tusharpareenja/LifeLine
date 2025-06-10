@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -14,11 +14,16 @@ export default function DoctorManagement() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await getDoctors();
+        const hospitalId = sessionStorage.getItem("hospitalId");
+        if (!hospitalId) {
+          setDoctors([]);
+          return;
+        }
+        const res = await getDoctors(hospitalId);
         setDoctors(res.data);
-        console.log(res);
+        console.log("Fetched doctors for hospital", res);
       } catch (error) {
-        console.error("Error fetching doctors:", error);
+        console.error("Error fetching doctors for hospital:", error);
       }
     };
     fetchDoctors();

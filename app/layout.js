@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         <Toaster toastOptions={{ className: "sonner"}} position="top-right" duration={5000}/>
         <SessionProvider>
         <div className=" bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 ">
-        <DarkModeToggle />
+        
         {children}
         </div>
         </SessionProvider>

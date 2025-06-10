@@ -1,37 +1,29 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
+import { useState } from "react"
 
-import HospitalOverview from "./components/hospital_overview"
-import DoctorManagement from "./components/doctor_management"
-import AmbulanceManagement from "./components/ambulance_management"
-import DiseaseInsights from "./components/disease_insight"
-import NotificationCenter from "./components/notification_center"
-import { auth } from "@/lib/auth"
-import { getSession, useSession } from "next-auth/react"
+import { TopHeader } from "./components/top-header"
+import { HospitalStatus } from "./components/hospital-status"
+import { StatsGrid } from "./components/status-grid"
+import { QuickActions } from "./components/QuickAction"
+import { WeeklyActivity } from "./components/WeeklyActivity"
 
-export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("overview")
+export default function LifeLineDashboard() {
+  const [isDark, setIsDark] = useState(false)
+  const [accent, setAccent] = useState("teal")
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-    
-      <main className="flex-1 p-8 overflow-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-        >
-          <HospitalOverview />
-          <DoctorManagement />
-          <AmbulanceManagement />
-          <DiseaseInsights />
-        </motion.div>
-        <NotificationCenter />
-      </main>
+    <div className="flex h-screen bg-gray-50">
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopHeader isDark={isDark} setIsDark={setIsDark} accent={accent} setAccent={setAccent} />
+        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          <HospitalStatus />
+          <StatsGrid />
+          <QuickActions />
+          <WeeklyActivity />
+        </main>
+      </div>
     </div>
   )
 }
-

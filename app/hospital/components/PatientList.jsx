@@ -1,7 +1,11 @@
-import React from 'react';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { Edit, Trash2, Eye, CalendarPlus } from 'lucide-react';
+import { AppointmentModal } from './AppointmentModal';
 
 export function PatientList({ patients, loading, onEdit, onDelete, onView }) {
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+
   if (loading) {
     return (
       <div className="text-center py-10">
@@ -42,6 +46,9 @@ export function PatientList({ patients, loading, onEdit, onDelete, onView }) {
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Appointment
               </th>
             </tr>
           </thead>
@@ -93,11 +100,27 @@ export function PatientList({ patients, loading, onEdit, onDelete, onView }) {
                     </button>
                   </div>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => { setSelectedPatient(patient); setShowAppointmentModal(true); }}
+                    className="text-green-600 hover:text-green-900 flex items-center gap-1"
+                    title="Add Appointment"
+                  >
+                    <CalendarPlus className="h-5 w-5" />
+                    Add Appointment
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showAppointmentModal && (
+        <AppointmentModal
+          patient={selectedPatient}
+          onClose={() => setShowAppointmentModal(false)}
+        />
+      )}
     </div>
   );
 }

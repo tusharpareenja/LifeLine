@@ -8,6 +8,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import {  Droplet, User } from 'lucide-react'
 import { getPatientById } from '../../actions/patients.js';
 import { getDoctors } from "@/app/actions/doctors"
+import { getNearbyHospitals } from "@/app/actions/hospitals"
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Souravv', date: '2025-02-15', time: '10:00 AM' },
@@ -361,6 +362,9 @@ const Dashboard = () => {
   const [userType, setUserType] = useState('patient');
   const [patientData, setPatientData] = useState(null);
   const [doctorList, setDoctorList] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [nearbyHospitals, setNearbyHospitals] = useState([]);
+  const [locationPrompted, setLocationPrompted] = useState(false);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -399,8 +403,37 @@ const Dashboard = () => {
     fetchPatientDetails();
   }, []);
 
+  // Prompt for location on dashboard load (once)
+  useEffect(() => {
+    if (!locationPrompted && userType === 'patient') {
+      setLocationPrompted(true);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setUserLocation({ latitude, longitude });
+          },
+          (error) => {
+            alert("Unable to retrieve your location. Please allow location access for nearest hospital bed availability.");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+  }, [locationPrompted, userType]);
+
+  // Fetch nearby hospitals when location is set
+  useEffect(() => {
+    if (userLocation) {
+      getNearbyHospitals(userLocation.latitude, userLocation.longitude, 10).then((hospitals) => {
+        setNearbyHospitals(hospitals);
+      });
+    }
+  }, [userLocation]);
+
   // Extract data for components
-  const hospitals = patientData?.hospitals || [];
+  const hospitals = userLocation ? nearbyHospitals : (patientData?.hospitals || []);
   const appointments = patientData?.appointments || upcomingAppointments; // Fallback to dummy data if none available
   const medicalRecords = patientData?.medicalRecords || recentMedicalReports; // Fallback to dummy data if none available
 
@@ -411,12 +444,19 @@ const Dashboard = () => {
           <>
             <WelcomeBanner user={patientData} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <UpcomingAppointments appointments={upcomingAppointments} /> 
+              <UpcomingAppointments appointments={upcomingAppointments} />
               <HospitalBedAvailability hospitals={hospitals} />
               <EmergencyServices />
               <DoctorRecommendations doctors={doctorList} />
               <RecentMedicalReports reports={medicalRecords} />
             </div>
+            {/* Show a message if location not set or no hospitals found */}
+            {userLocation && nearbyHospitals.length === 0 && (
+              <div className="text-center text-gray-500 py-4">No nearby hospitals found within 10km.</div>
+            )}
+            {!userLocation && (
+              <div className="text-center text-gray-500 py-4">Location required to show nearest hospital bed availability.</div>
+            )}
           </>
         )}
 

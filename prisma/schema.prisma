@@ -40,17 +40,18 @@ model Patient {
   gender          Gender
   bloodType       BloodType?
   allergy         String?
-  state         String?
+  state           String?
   city            String?
   address         String?
   surgery         String?
   medicalIssue    String?   @map("medical_issue")
   emergencyContact String?  @map("emergency_contact")
+  hospitalId      String?   @map("hospital_id") // New: Affiliated hospital (optional for migration)
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hospital        Hospital?  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
   doctors         Doctor[]
-  hospitals       Hospital[]
   medicalRecords  MedicalRecord[]
   familyHistory   FamilyHistory[]
   appointments    Appointment[]
@@ -78,6 +79,9 @@ model Doctor {
   specialization  String?
   experience      Int       @default(0)
   availability    Boolean   @default(true)
+  phone           String?   @unique // New: Doctor's phone number
+  degree          String?   // New: MBBS, MD, MS, etc.
+  department      String?   // New: Department/Unit
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)

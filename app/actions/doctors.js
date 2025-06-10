@@ -3,12 +3,9 @@
 
 import { revalidatePath } from "next/cache";
 import db from "../db/db";
-
-// Create a new doctor
 export async function createDoctor(data) {
   try {
     console.log(data)
-    // Check if the hospital exists
     const hospital = await db.hospital.findUnique({
       where: { id: data.hospitalId }
     });
@@ -30,6 +27,9 @@ export async function createDoctor(data) {
         specialization: data.specialization,
         experience: data.experience || 0,
         availability: data.availability !== undefined ? data.availability : true,
+        phone: data.phone,
+        degree: data.degree,
+        department: data.department,
         user: {
           connect: {
             id: user.id
@@ -55,16 +55,14 @@ export async function createDoctor(data) {
 }
 
 // Get all doctors (with optional filtering)
-export async function getDoctors() {
+export async function getDoctors(hospitalId) {
   try {
     const where = {};
-    
-    
-    
-  
-
+    if (hospitalId) {
+      where.hospitalId = hospitalId;
+    }
     const doctors = await db.doctor.findMany({
-      
+      where,
       include: {
         user: {
           select: {
@@ -217,4 +215,25 @@ export async function toggleDoctorAvailability(id) {
     console.error("Failed to toggle doctor availability:", error);
     return { success: false, error: "Failed to update doctor availability" };
   }
+}
+
+export async function getDoctorByHospital(hospitalId) {
+  try {
+    const doctors = await db.doctor.findMany({
+      where: { hospitalId },
+      include: {
+        user: true
+      }
+    });
+
+    if (!doctors || doctors.length === 0) {
+      return { success: false, error: "No doctors found for this hospital" };
+    }
+
+    return { success: true, data: doctors };
+  } catch (error) {
+    console.error("Failed to fetch doctors by hospital:", error);
+    return { success: false, error: "Failed to fetch doctors by hospital" };
+  }
+  
 }

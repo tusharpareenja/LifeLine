@@ -39,7 +39,7 @@ function App() {
           await sendEmail({
             to: result.data.user.email,
             subject: 'Patient Account created succesfully !',
-            text: `Your patient account has been created by ${result.data.hospitals[0].name}`,
+            text: `Your patient account has been created by ${result.data.hospital?.name}`,
             html: `<p>Your password is: <strong>${password}</strong></p>`
           })
           fetchPatients();

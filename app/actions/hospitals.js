@@ -108,21 +108,20 @@ export async function createPatient({data, hospitalId}) {
         city: data.city ?? "",
         address: data.address ?? "",
         state: data.state ?? "",
-        
         user: {
           connect: {
             id: newUser.id, // Connect to the newly created user
           },
         },
-        hospitals: {
+        hospital: {
           connect: {
-            id: hospitalId, // Connect to the hospital
+            id: hospitalId, // Connect to the hospital (affiliated hospital)
           },
         },
       },
       include: {
         user: true, // Include the user in the response
-        hospitals: true, // Include the hospital in the response
+        hospital: true, // Include the hospital in the response
       },
     });
     console.log(newPatient)
@@ -142,8 +141,8 @@ export async function getPatients(id) {
   try {
     console.log(id)
     const patients = await db.patient.findMany({
-      where : {
-        hospitals: { some: { id } } 
+      where: {
+        hospitalId: id
       },
       include: {
         user: {
@@ -152,6 +151,7 @@ export async function getPatients(id) {
             email: true
           }
         },
+        hospital: true
       }
     });
     console.log(patients)
