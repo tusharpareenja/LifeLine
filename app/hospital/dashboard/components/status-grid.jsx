@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Activity, Bed, Users, AlertTriangle, HeartPulse } from "lucide-react"
 import { getHospitalDetails } from "@/app/actions/admin"
+import { getBeds } from "@/app/actions/beds"
 
 export function StatsGrid() {
   const [stats, setStats] = useState([
@@ -57,27 +58,43 @@ export function StatsGrid() {
         return
       }
 
-      const details = await getHospitalDetails(hospitalId)
-      // Fallbacks for missing fields
-      const totalBeds = details.totalBeds ?? 0
-      const availableBeds = details.availableBeds ?? 0
-      const icuBeds = details.icuBeds ?? 0
-      const occupiedIcuBeds = details.occupiedIcuBeds ?? 0
+      // Fetch both hospital details and beds
+      const [details, bedsResult] = await Promise.all([
+        getHospitalDetails(hospitalId),
+        getBeds(hospitalId)
+      ])
+
+      // Calculate bed statistics
+      const allBeds = bedsResult?.success ? bedsResult.data : []
+      const totalBeds = allBeds.length
+      const availableBeds = allBeds.filter(bed => bed.status === "AVAILABLE").length
+      const occupiedBeds = allBeds.filter(bed => bed.status === "OCCUPIED").length
+      const maintenanceBeds = allBeds.filter(bed => bed.status === "MAINTENANCE").length
+      
+      // Calculate ICU specific stats
+      const icuBeds = allBeds.filter(bed => bed.type.toLowerCase() === "icu").length
+      const occupiedIcuBeds = allBeds.filter(bed => 
+        bed.type.toLowerCase() === "icu" && bed.status === "OCCUPIED"
+      ).length
+
       // Calculate percentages safely
-      const totalOccupancy = totalBeds > 0 ? Math.round(((totalBeds - availableBeds) / totalBeds) * 100) : 0
+      const totalOccupancy = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0
       const icuUtilization = icuBeds > 0 ? Math.round((occupiedIcuBeds / icuBeds) * 100) : 0
+
       // Determine trends
       const totalTrend = availableBeds < (totalBeds / 2) ? 
-        { text: `+${100 - totalOccupancy}% capacity`, color: "text-orange-600" } : 
-        { text: `${totalOccupancy}% capacity`, color: "text-teal-600" }
+        { text: `${availableBeds} beds available`, color: "text-orange-600" } : 
+        { text: `${availableBeds} beds available`, color: "text-teal-600" }
+      
       const icuTrend = occupiedIcuBeds > (icuBeds / 2) ? 
-        { text: `Only ${icuBeds - occupiedIcuBeds} available`, color: "text-orange-600" } : 
-        { text: `${icuUtilization}% utilized`, color: "text-teal-600" }
-      // Update stats with only available backend data
+        { text: `${icuBeds - occupiedIcuBeds} ICU beds free`, color: "text-orange-600" } : 
+        { text: `${icuBeds - occupiedIcuBeds} ICU beds free`, color: "text-teal-600" }
+
+      // Update stats with real-time bed data
       setStats([
         {
-          title: "Available Beds",
-          value: (totalBeds - availableBeds).toString(),
+          title: "Total Beds",
+          value: occupiedBeds.toString(),
           total: totalBeds.toString(),
           subtitle: `${totalOccupancy}% Occupancy Rate`,
           trend: totalTrend.text,

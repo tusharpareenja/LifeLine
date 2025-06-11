@@ -381,19 +381,35 @@ const Dashboard = () => {
     fetchDoctors();
   }, []);
 
+  // Update the patient data fetching logic
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
+        // Try to get userId first, fallback to patientId
+        const userId = sessionStorage.getItem("userId");
         const patientId = sessionStorage.getItem("patientId");
-        console.log("Fetching patient details with ID:", patientId);
+        const id = userId || patientId;
         
-        const response = await getPatientById(patientId);
-        console.log("Patient data structure:", JSON.stringify(response, null, 2));
+        if (!id) {
+          console.error("No user ID or patient ID found in session");
+          return;
+        }
+
+        console.log("Fetching patient details with ID:", id);
+        const response = await getPatientById(id);
+        console.log("Patient data response:", response);
         
-        if (response && response.success && response.data) {
-          setPatientData(response.data);
+        if (response?.success && response?.data) {
+          // Combine user and patient data
+          const userData = {
+            ...response.data,
+            name: response.data.user?.name || response.data.name,
+            email: response.data.user?.email,
+            image: response.data.user?.image,
+          };
+          setPatientData(userData);
         } else {
-          console.error("Failed to fetch patient data or invalid data structure");
+          console.error("Failed to fetch patient data:", response?.error);
         }
       } catch (error) {
         console.error("Error fetching patient details:", error);
@@ -431,9 +447,8 @@ const Dashboard = () => {
       });
     }
   }, [userLocation]);
-
   // Extract data for components
-  const hospitals = userLocation ? nearbyHospitals : (patientData?.hospitals || []);
+  const hospitals = userLocation ? nearbyHospitals : (patientData?.hospital ? [patientData.hospital] : []);
   const appointments = patientData?.appointments || upcomingAppointments; // Fallback to dummy data if none available
   const medicalRecords = patientData?.medicalRecords || recentMedicalReports; // Fallback to dummy data if none available
 

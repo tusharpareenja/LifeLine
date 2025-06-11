@@ -83,19 +83,22 @@ export async function getPatients(id) {
 }
 
 // Get a single patient by ID
-export async function getPatientById(id) {
-  try {
-    const patient = await db.patient.findUnique({
+export async function getPatientById(id) {  try {
+    let patient;
+    
+    // First try to find by patientId
+    patient = await db.patient.findUnique({
       where: { id },
       include: {
         user: {
           select: {
             name: true,
-            email: true
+            email: true,
+            image: true
           }
         },
-        hospitals : true,
-        doctors : true,
+        hospital: true,
+        doctors: true,
         medicalRecords: true,
         familyHistory: true,
         appointments: {
@@ -109,9 +112,44 @@ export async function getPatientById(id) {
             },
             hospital: true
           }
-        }
+        },
+        emergencyRequests: true,
+        prescriptions: true,
+        beds: true
       }
     });
+
+    // If not found, try to find by userId
+    if (!patient) {
+      patient = await db.patient.findUnique({
+        where: { userId: id },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+              image: true
+            }
+          },
+          hospitals: true,
+          doctors: true,
+          medicalRecords: true,
+          familyHistory: true,
+          appointments: {
+            include: {
+              doctor: {
+                include: {
+                  user: {
+                    select: { name: true }
+                  }
+                }
+              },
+              hospital: true
+            }
+          }
+        }
+      });
+    }
 
     if (!patient) {
       return { success: false, error: "Patient not found" };

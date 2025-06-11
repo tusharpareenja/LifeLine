@@ -15,7 +15,6 @@ const initialFormData = {
   address: "",
   phone: "",
   totalBeds: 0,
-  availableBeds: 0,
   icuBeds: 0,
   ventilators: 0,
   contactName: "",
@@ -34,7 +33,7 @@ function HospitalRequestForm() {
     const { name, value } = e.target;
 
     // Handle number inputs
-    if (["totalBeds", "availableBeds", "icuBeds", "ventilators"].includes(name)) {
+    if (["totalBeds", "icuBeds", "ventilators"].includes(name)) {
       setFormData({
         ...formData,
         [name]: parseInt(value) || 0,
@@ -79,15 +78,9 @@ function HospitalRequestForm() {
         newErrors.phone = "Please enter a valid phone number";
       }
       if (!formData.contactName.trim()) newErrors.contactName = "Contact name is required";
-    }
-
-    if (currentStep === 3) {
+    }    if (currentStep === 3) {
       // Validate capacity information
       if (formData.totalBeds <= 0) newErrors.totalBeds = "Total beds must be greater than 0";
-      if (formData.availableBeds < 0) newErrors.availableBeds = "Available beds cannot be negative";
-      if (formData.availableBeds > formData.totalBeds) {
-        newErrors.availableBeds = "Available beds cannot exceed total beds";
-      }
       if (formData.icuBeds < 0) newErrors.icuBeds = "ICU beds cannot be negative";
       if (formData.icuBeds > formData.totalBeds) {
         newErrors.icuBeds = "ICU beds cannot exceed total beds";
@@ -420,29 +413,6 @@ function HospitalRequestForm() {
                       />
                     </div>
                     {errors.totalBeds && <p className="mt-1 text-sm text-red-600">{errors.totalBeds}</p>}
-                  </div>
-
-                  <div>
-                    <label htmlFor="availableBeds" className="block text-sm font-medium text-gray-700 mb-1">
-                      Available Beds*
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Bed className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="number"
-                        id="availableBeds"
-                        name="availableBeds"
-                        min="0"
-                        value={formData.availableBeds}
-                        onChange={handleChange}
-                        className={`pl-10 block w-full rounded-md border ${
-                          errors.availableBeds ? "border-red-300" : "border-gray-300"
-                        } shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                      />
-                    </div>
-                    {errors.availableBeds && <p className="mt-1 text-sm text-red-600">{errors.availableBeds}</p>}
                   </div>
                 </div>
 

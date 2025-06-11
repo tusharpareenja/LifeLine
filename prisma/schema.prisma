@@ -57,6 +57,7 @@ model Patient {
   appointments    Appointment[]
   emergencyRequests EmergencyRequest[]
   prescriptions   Prescription[]
+  beds            Bed[] // New: beds assigned to this patient
 
   // Additional Medical Information
   yearlyIncome      String?
@@ -119,6 +120,7 @@ model Hospital {
   medicalRecords  MedicalRecord[]
   appointments    Appointment[]
   emergencyRequests EmergencyRequest[]
+  beds            Bed[]
 
   @@map("hospitals")
 }
@@ -205,6 +207,23 @@ model Prescription {
   @@map("prescriptions")
 }
 
+// 10. Beds Model
+model Bed {
+  id           String   @id @map("bed_id") // e.g., B001, B002
+  hospitalId   String   @map("hospital_id")
+  type         BedType  @default(GENERAL)
+  status       BedStatus @default(AVAILABLE)
+  room         String
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  patientId    String?  @map("patient_id") // patient assigned to this bed (if occupied)
+  patientName  String?  @map("patient_name") // Store patient name directly
+
+  // Relations
+  hospital     Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  patient      Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  @@map("beds")
+}
 
 enum Gender {
   Male
@@ -259,6 +278,22 @@ enum Role {
   DOCTOR          @map("Doctor")
   PATIENT         @map("Patient")
   HOSPITAL        @map("Hospital")
+}
+
+enum BedType {
+  GENERAL   @map("General")
+  ICU       @map("ICU")
+  EMERGENCY @map("Emergency")
+  PEDIATRIC @map("Pediatric")
+  CARDIAC   @map("Cardiac")
+  SURGICAL  @map("Surgical")
+}
+
+enum BedStatus {
+  AVAILABLE      @map("Available")
+  OCCUPIED       @map("Occupied")
+  RESERVED       @map("Reserved")
+  MAINTENANCE    @map("Maintenance")
 }
 
 
