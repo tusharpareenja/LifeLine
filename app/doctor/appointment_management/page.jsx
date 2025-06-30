@@ -7,6 +7,8 @@ import { NotificationsPanel } from "../components/Notification-panel"
 
 export default function Appointments() {
   const [activeTab, setActiveTab] = useState("appointments")
+  const doctorId = sessionStorage.getItem("doctorId");
+  console.log("Doctor ID from session storage:", doctorId);
 
   return (
     <div className="p-6 bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-800 dark:to-gray-900 rounded-lg shadow-lg">
@@ -18,7 +20,7 @@ export default function Appointments() {
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         <TabsContent value="appointments">
-          <AppointmentManagement />
+          <AppointmentManagement doctorId={doctorId} />
         </TabsContent>
         <TabsContent value="reports">
           <MedicalReports />

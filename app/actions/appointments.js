@@ -28,7 +28,7 @@ export async function createAppointment(data) {
 
     // Create appointment data
     const appointmentData = {
-      appointmentDate: new Date(data.appointmentDate),
+      date: new Date(data.appointmentDate), // Use 'date' as per Prisma schema
       consultationType: data.consultationType,
       patient: {
         connect: { id: data.patientId }
@@ -61,6 +61,8 @@ export async function createAppointment(data) {
     const newAppointment = await db.appointment.create({
       data: appointmentData
     });
+
+    console.log("Appointment created:", newAppointment); // Debug log
 
     revalidatePath("/appointments");
     revalidatePath(`/patients/${data.patientId}`);
@@ -126,7 +128,7 @@ export async function getAppointments(filter) {
         }
       },
       orderBy: {
-        appointmentDate: 'asc'
+        date: 'asc' // Fix: use 'date' instead of 'appointmentDate'
       }
     });
     

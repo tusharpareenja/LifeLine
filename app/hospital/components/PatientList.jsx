@@ -1,10 +1,31 @@
 import React, { useState } from 'react';
 import { Edit, Trash2, Eye, CalendarPlus } from 'lucide-react';
 import { AppointmentModal } from './AppointmentModal';
+import { createAppointment } from "@/app/actions/appointments";
 
 export function PatientList({ patients, loading, onEdit, onDelete, onView }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
+  const [appointmentError, setAppointmentError] = useState("");
+
+  // Handler to create appointment and close modal
+  const handleCreateAppointment = async (appointmentData) => {
+    setAppointmentLoading(true);
+    setAppointmentError("");
+    try {
+      const res = await createAppointment(appointmentData);
+      if (!res.success) {
+        setAppointmentError(res.error || "Failed to create appointment");
+      } else {
+        setShowAppointmentModal(false);
+      }
+    } catch (err) {
+      setAppointmentError("Failed to create appointment");
+    } finally {
+      setAppointmentLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -119,6 +140,9 @@ export function PatientList({ patients, loading, onEdit, onDelete, onView }) {
         <AppointmentModal
           patient={selectedPatient}
           onClose={() => setShowAppointmentModal(false)}
+          onCreateAppointment={handleCreateAppointment}
+          loading={appointmentLoading}
+          error={appointmentError}
         />
       )}
     </div>
