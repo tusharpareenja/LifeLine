@@ -268,6 +268,15 @@ export default function NearbyHospitals() {
                                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {hospital.lastUpdated}</span>
                               )}
                             </div>
+                            {/* Show average hospital feedback rating or fallback */}
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className="text-xs text-gray-600">Avg. Rating:</span>
+                              {typeof hospital.averageHospitalRating === 'number' ? (
+                                <span className="font-semibold text-yellow-500">{hospital.averageHospitalRating.toFixed(1)} / 5</span>
+                              ) : (
+                                <span className="text-xs text-gray-400">No ratings yet</span>
+                              )}
+                            </div>
                           </div>
                           <div className="flex flex-col items-end gap-2 min-w-[120px]">
                             {hospital.isEmergency && (

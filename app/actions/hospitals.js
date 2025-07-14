@@ -331,15 +331,27 @@ export async function getNearbyHospitals(latitude, longitude, distanceKm = 10) {
     ORDER BY distance ASC
     LIMIT 50;
   `;
-  // Return all relevant fields for frontend, mapping snake_case to camelCase
-  return hospitals.map(h => ({
-    id: h.id,
-    name: h.name,
-    address: h.address,
-    distance: h.distance,
-    availableBeds: h.available_beds,
-    totalBeds: h.total_beds,
-    icuBeds: h.icu_beds,
-    ventilators: h.ventilators
-  }));
+
+  // For each hospital, get average hospitalRating from feedback table
+  const hospitalsWithFeedback = await Promise.all(
+    hospitals.map(async (h) => {
+      // Get average hospitalRating for this hospital
+      const avgResult = await db.feedback.aggregate({
+        _avg: { hospitalRating: true },
+        where: { hospitalId: h.id },
+      });
+      return {
+        id: h.id,
+        name: h.name,
+        address: h.address,
+        distance: h.distance,
+        availableBeds: h.available_beds,
+        totalBeds: h.total_beds,
+        icuBeds: h.icu_beds,
+        ventilators: h.ventilators,
+        averageHospitalRating: avgResult._avg.hospitalRating ?? null,
+      };
+    })
+  );
+  return hospitalsWithFeedback;
 }

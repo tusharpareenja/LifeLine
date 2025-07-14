@@ -7,46 +7,36 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-const mockDoctors = [
-  {
-    id: 1,
-    name: "Dr. Emily Chen",
-    specialty: "Pediatrician",
-    experience: "10 years",
-    hospital: "LifeLine Children's Hospital",
-    rating: 4.8,
-    fee: 150,
-    availability: "Available today",
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 2,
-    name: "Dr. Michael Lee",
-    specialty: "Cardiologist",
-    experience: "15 years",
-    hospital: "LifeLine Heart Center",
-    rating: 4.9,
-    fee: 200,
-    availability: "Next available: Tomorrow",
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 3,
-    name: "Dr. Sarah Johnson",
-    specialty: "Dermatologist",
-    experience: "8 years",
-    hospital: "LifeLine Skin Clinic",
-    rating: 4.7,
-    fee: 180,
-    availability: "Available today",
-    image: "/placeholder.svg?height=100&width=100",
-  },
-]
+import { useEffect} from "react";
+import { getDoctors } from "@/app/actions/doctors";
 
 export default function DoctorSearch() {
-  const [specialty, setSpecialty] = useState("")
-  const [consultationType, setConsultationType] = useState("")
+  const [specialty, setSpecialty] = useState("");
+  const [consultationType, setConsultationType] = useState("");
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    async function fetchDoctors() {
+      // You can filter by hospitalId or specialty if needed
+      const res = await getDoctors();
+      if (res.success) {
+        // Use backend-provided averageDoctorRating
+        const doctorsWithRating = res.data.map((doc) => ({
+          id: doc.id,
+          name: doc.user?.name || "Doctor",
+          specialty: doc.specialization,
+          experience: doc.experience + " years",
+          hospital: doc.hospital?.name || "-",
+          rating: doc.averageDoctorRating,
+          fee: doc.fee || 0,
+          availability: doc.availability ? "Available today" : "Not available",
+          image: "/placeholder.svg?height=100&width=100",
+        }));
+        setDoctors(doctorsWithRating);
+      }
+    }
+    fetchDoctors();
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -72,7 +62,7 @@ export default function DoctorSearch() {
         </Select>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mockDoctors.map((doctor) => (
+        {doctors.map((doctor) => (
           <motion.div
             key={doctor.id}
             initial={{ opacity: 0, y: 20 }}
@@ -99,7 +89,7 @@ export default function DoctorSearch() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>Experience: {doctor.experience}</div>
                   <div>Hospital: {doctor.hospital}</div>
-                  <div>Rating: {doctor.rating}/5</div>
+                  <div>Rating: {typeof doctor.rating === 'number' ? doctor.rating.toFixed(1) + '/5' : 'No ratings yet'}</div>
                   <div>Fee: ${doctor.fee}</div>
                 </div>
                 <Badge className="mt-2" variant="secondary">
@@ -112,6 +102,6 @@ export default function DoctorSearch() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 

@@ -1,8 +1,10 @@
+"use client"
 import Image from "next/image";
 import LoginForm from "../../Components/Login";
 import DarkModeToggle from "../../Components/DarkMode";
 import Logo from "../../Components/Logo";
-import AnimatedBackground from "../../Components/AnimatedBackground";
+import dynamic from "next/dynamic";
+const AnimatedBackground = dynamic(() => import("../../Components/AnimatedBackground"), { ssr: false });
 
 export default function Home() {
   return (

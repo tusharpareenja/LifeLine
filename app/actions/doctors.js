@@ -78,7 +78,21 @@ export async function getDoctors(hospitalId) {
         }
       }
     });
-    return { success: true, data: doctors };
+
+    // For each doctor, get average doctorRating from feedback table
+    const doctorsWithRating = await Promise.all(
+      doctors.map(async (doc) => {
+        const avgResult = await db.feedback.aggregate({
+          _avg: { doctorRating: true },
+          where: { doctorId: doc.id },
+        });
+        return {
+          ...doc,
+          averageDoctorRating: avgResult._avg.doctorRating ?? null,
+        };
+      })
+    );
+    return { success: true, data: doctorsWithRating };
   } catch (error) {
     console.error("Failed to fetch doctors:", error);
     return { success: false, error: "Failed to fetch doctors" };

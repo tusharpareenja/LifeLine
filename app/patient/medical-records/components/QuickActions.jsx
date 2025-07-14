@@ -16,12 +16,14 @@ export default function QuickActions() {
         <Button>
           <Upload className="mr-2 h-4 w-4" /> Upload Report
         </Button>
-        <Link href={'/patient/medical-records/download_record'} >
-
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" /> Download All
-        </Button>
-        
+        <Link href={
+          typeof window !== 'undefined' && sessionStorage.getItem('patientId')
+            ? `/patient/medical-records/download_record/${sessionStorage.getItem('patientId')}`
+            : '/patient/medical-records/download_record'
+        }>
+          <Button variant="outline">
+            <Download className="mr-2 h-4 w-4" /> Download All
+          </Button>
         </Link>
 
         <Button variant="outline">

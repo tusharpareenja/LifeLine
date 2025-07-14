@@ -58,6 +58,7 @@ model Patient {
   emergencyRequests EmergencyRequest[]
   prescriptions   Prescription[]
   beds            Bed[] // New: beds assigned to this patient
+  feedbacks       Feedback[] @relation("PatientFeedback")
 
   // Additional Medical Information
   yearlyIncome      String?
@@ -91,6 +92,7 @@ model Doctor {
   medicalRecords  MedicalRecord[]
   appointments    Appointment[]
   prescriptions   Prescription[]
+  feedbacks Feedback[] @relation("DoctorFeedback")
 
   @@map("doctors")
 }
@@ -122,6 +124,9 @@ model Hospital {
   emergencyRequests EmergencyRequest[]
   beds            Bed[]
 
+  bloodBankStocks BloodBankStock[]
+  feedbacks Feedback[] @relation("HospitalFeedback")
+
   @@map("hospitals")
 }
 
@@ -140,6 +145,7 @@ model MedicalRecord {
   patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
   doctor          Doctor?   @relation(fields: [doctorId], references: [id], onDelete: SetNull)
   hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+  
 
   @@map("medical_records")
 }
@@ -172,6 +178,7 @@ model Appointment {
   patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
   doctor          Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   hospital        Hospital? @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+  feedbacks Feedback[] @relation("AppointmentFeedback")
 
   @@map("appointments")
 }
@@ -223,6 +230,45 @@ model Bed {
   patient      Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
 
   @@map("beds")
+}
+
+// 11. Blood Bank Stock Model
+model BloodBankStock {
+  id           String     @id @default(uuid())
+  hospitalId   String
+  bloodType    BloodType
+  quantity     Int        @default(0)
+  threshold    Int        @default(5)
+  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime   @default(now())
+
+  // Relations
+  hospital     Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
+  @@unique([hospitalId, bloodType])
+  @@map("blood_bank_stock")
+}
+
+/// Feedback for appointments, doctors, hospitals, and services
+model Feedback {
+  id              String   @id @default(uuid())
+  appointmentId   String
+  patientId       String
+  doctorId        String?
+  hospitalId      String?
+  doctorRating    Int      // 1-5
+  hospitalRating  Int      // 1-5
+  servicesRating  Int      // 1-5
+  message         String?  // Optional comments
+  createdAt       DateTime @default(now())
+
+  // Relations
+  appointment     Appointment @relation("AppointmentFeedback", fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient         Patient     @relation("PatientFeedback", fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          Doctor?     @relation("DoctorFeedback", fields: [doctorId], references: [id], onDelete: SetNull)
+  hospital        Hospital?   @relation("HospitalFeedback", fields: [hospitalId], references: [id], onDelete: SetNull)
+
+  @@map("feedback")
 }
 
 enum Gender {

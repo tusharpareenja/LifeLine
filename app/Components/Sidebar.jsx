@@ -1,6 +1,23 @@
 'use client'
 import React, { useState } from 'react';
-import { Menu, Home, Calendar, FileText, MessageSquare, Bell, Settings, LogOut, IndianRupee, Bed } from 'lucide-react';
+import {
+  Menu,
+  Home,
+  Calendar,
+  FileText,
+  MessageSquare,
+  Bell,
+  Settings,
+  LogOut,
+  IndianRupee,
+  Bed,
+  HeartPulse,
+  HandCoins,
+  CreditCard,
+  ShieldCheck,
+  Droplets,
+  UserPlus
+} from 'lucide-react';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +64,7 @@ const Sidebar = () => {
                 <span>Dashboard</span>
               </a>
             </li>
-             <li>
+            <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -67,8 +84,7 @@ const Sidebar = () => {
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
                 onClick={(e) => {
                   e.preventDefault();
-                  // Redirect to Appointments
-                  window.location.href = '/patient/appointments'; // Example redirect
+                  window.location.href = '/patient/appointments';
                   setIsOpen(false);
                 }}
               >
@@ -114,11 +130,11 @@ const Sidebar = () => {
                   setIsOpen(false);
                 }}
               >
-                <IndianRupee className="w-5 h-5 mr-3" />
+                <ShieldCheck className="w-5 h-5 mr-3" />
                 <span>Insurance</span>
               </a>
             </li>
-                        <li>
+            <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -128,7 +144,7 @@ const Sidebar = () => {
                   setIsOpen(false);
                 }}
               >
-                <IndianRupee className="w-5 h-5 mr-3" />
+                <HandCoins className="w-5 h-5 mr-3" />
                 <span>Subsidies</span>
               </a>
             </li>
@@ -142,7 +158,7 @@ const Sidebar = () => {
                   setIsOpen(false);
                 }}
               >
-                <Settings className="w-5 h-5 mr-3" />
+                <CreditCard className="w-5 h-5 mr-3" />
                 <span>LifeLine Credit System</span>
               </a>
             </li>
@@ -156,8 +172,22 @@ const Sidebar = () => {
                   setIsOpen(false);
                 }}
               >
-                <Settings className="w-5 h-5 mr-3" />
+                <HeartPulse className="w-5 h-5 mr-3" />
                 <span>Microinsurance</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/patient/donation-dashboard';
+                  setIsOpen(false);
+                }}
+              >
+                <Droplets className="w-5 h-5 mr-3" />
+                <span>Blood Donation</span>
               </a>
             </li>
             <li>
