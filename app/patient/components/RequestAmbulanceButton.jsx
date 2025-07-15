@@ -1,10 +1,10 @@
 "use client";
-import { useSocket } from "../../lib/socket";
+import { getSocket } from "@/lib/socket";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export default function RequestAmbulanceButton({ hospitalId }) {
-  const socket = useSocket("patient");
+  const socket = getSocket("patient");
   const { data: session } = useSession();
 
   const handleRequest = () => {

@@ -10,7 +10,6 @@ import { getPatientById } from '../../actions/patients.js';
 import { getDoctors } from "@/app/actions/doctors"
 import { getNearbyHospitals } from "@/app/actions/hospitals"
 import RequestAmbulanceButton from '@/app/patient/components/RequestAmbulanceButton';
-import AmbulanceAlerts from '@/app/hospital/components/AmbulanceAlerts';
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Souravv', date: '2025-02-15', time: '10:00 AM' },
