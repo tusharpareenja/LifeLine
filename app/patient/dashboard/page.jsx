@@ -9,6 +9,8 @@ import {  Droplet, User } from 'lucide-react'
 import { getPatientById } from '../../actions/patients.js';
 import { getDoctors } from "@/app/actions/doctors"
 import { getNearbyHospitals } from "@/app/actions/hospitals"
+import RequestAmbulanceButton from '@/app/patient/components/RequestAmbulanceButton';
+import AmbulanceAlerts from '@/app/hospital/components/AmbulanceAlerts';
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Souravv', date: '2025-02-15', time: '10:00 AM' },
@@ -134,11 +136,8 @@ const EmergencyServices = () => (
         112 Emergency
       </Button>
 
-      <Button
-        onClick={() => window.open("https://medulance.com/", "_blank")}
-      >
-        Book Ambulance
-      </Button>
+      <RequestAmbulanceButton />
+      {/* <AmbulanceAlerts /> */}
 
       <Button
         onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}

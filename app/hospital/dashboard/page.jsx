@@ -7,6 +7,7 @@ import { HospitalStatus } from "./components/hospital-status"
 import { StatsGrid } from "./components/status-grid"
 import { QuickActions } from "./components/QuickAction"
 import { WeeklyActivity } from "./components/WeeklyActivity"
+import AmbulanceAlerts from "../components/AmbulanceAlerts"
 
 export default function LifeLineDashboard() {
   const [isDark, setIsDark] = useState(false)
@@ -18,6 +19,7 @@ export default function LifeLineDashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopHeader isDark={isDark} setIsDark={setIsDark} accent={accent} setAccent={setAccent} />
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          <AmbulanceAlerts />
           <HospitalStatus />
           <StatsGrid />
           <QuickActions />

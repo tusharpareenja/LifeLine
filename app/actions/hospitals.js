@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { PrismaClient } from "@prisma/client";
-import { id } from "ethers";
 
 const db = new PrismaClient();
 
