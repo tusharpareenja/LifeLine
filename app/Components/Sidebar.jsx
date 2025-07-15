@@ -106,7 +106,7 @@ const Sidebar = () => {
                 <span>Medical Records</span>
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -119,8 +119,8 @@ const Sidebar = () => {
                 <MessageSquare className="w-5 h-5 mr-3" />
                 <span>Consultation & Medication</span>
               </a>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -133,7 +133,7 @@ const Sidebar = () => {
                 <ShieldCheck className="w-5 h-5 mr-3" />
                 <span>Insurance</span>
               </a>
-            </li>
+            </li> */}
             <li>
               <a
                 href="#"
@@ -148,7 +148,7 @@ const Sidebar = () => {
                 <span>Subsidies</span>
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -161,8 +161,8 @@ const Sidebar = () => {
                 <CreditCard className="w-5 h-5 mr-3" />
                 <span>LifeLine Credit System</span>
               </a>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -175,7 +175,7 @@ const Sidebar = () => {
                 <HeartPulse className="w-5 h-5 mr-3" />
                 <span>Microinsurance</span>
               </a>
-            </li>
+            </li> */}
             <li>
               <a
                 href="#"

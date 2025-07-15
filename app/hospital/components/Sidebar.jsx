@@ -121,7 +121,7 @@ const Sidebar = () => {
               </a>
               
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -134,7 +134,7 @@ const Sidebar = () => {
                 <ScanSearch className="w-5 h-5 mr-3" />
                 <span>Search Patient</span>
               </a>
-            </li>
+            </li> */}
             <li>
               <a
                 href="#"
@@ -149,7 +149,7 @@ const Sidebar = () => {
                 <span>Blood Bank Management</span>
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -162,8 +162,8 @@ const Sidebar = () => {
                 <HandCoins className="w-5 h-5 mr-3" />
                 <span>Subsidies</span>
               </a>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center px-6 py-3 text-white hover:bg-blue-700 transition-colors duration-200"
@@ -176,7 +176,7 @@ const Sidebar = () => {
                 <Settings className="w-5 h-5 mr-3" />
                 <span>Social Services</span>
               </a>
-            </li>
+            </li> */}
             <li>
               <a
                 href="#"
