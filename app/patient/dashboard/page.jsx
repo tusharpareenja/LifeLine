@@ -121,33 +121,71 @@ const HospitalBedAvailability = ({ hospitals = [] }) => (
   </Card>
 );
 
-const EmergencyServices = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Emergency Services</CardTitle>
-    </CardHeader>
-    <CardContent className="flex flex-col space-y-2">
-      <Button
-        variant="destructive"
-        onClick={() => window.location.href = "tel:112"}
-      >
-        112 Emergency
-      </Button>
+function EmergencyServicesWithSOS() {
+  const [showSOS, setShowSOS] = useState(false);
+  const [timer, setTimer] = useState(5);
+  useEffect(() => {
+    let interval;
+    if (showSOS && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    if (timer === 0 && showSOS) {
+      // Trigger SOS call after 5 seconds
+      window.location.href = "tel:112";
+      setShowSOS(false);
+      setTimer(5);
+    }
+    return () => clearInterval(interval);
+  }, [showSOS, timer]);
 
-      <Button
-        onClick={() => window.open("https://medulance.com/", "_blank")}
-      >
-        Book Ambulance
-      </Button>
+  const handleEmergencyClick = () => {
+    setShowSOS(true);
+    setTimer(5);
+  };
+  const handleCancel = () => {
+    setShowSOS(false);
+    setTimer(5);
+  };
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Emergency Services</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col space-y-2">
+        <Button
+          variant="destructive"
+          onClick={handleEmergencyClick}
+        >
+          SOS Emergency
+        </Button>
+        <Button
+          onClick={() => window.open("https://medulance.com/", "_blank")}
+        >
+          Book Ambulance
+        </Button>
+        <Button
+          onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
+        >
+          Find Blood Banks
+        </Button>
+      </CardContent>
+      {showSOS && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 w-full max-w-sm mx-4 flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">SOS Call Initiating...</h2>
+            <div className="text-5xl font-bold text-gray-800 mb-4">{timer}</div>
+            <Button variant="outline" onClick={handleCancel} className="mt-2">Cancel</Button>
+            <p className="mt-4 text-gray-500 text-center">Calling emergency number 112 in {timer} seconds...</p>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
 
-      <Button
-        onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
-      >
-        Find Blood Banks
-      </Button>
-    </CardContent>
-  </Card>
-);
+const EmergencyServices = () => <EmergencyServicesWithSOS />;
 
 const DoctorRecommendations = ({ doctors = [] }) => (
   <Card>

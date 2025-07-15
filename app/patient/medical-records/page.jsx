@@ -56,7 +56,6 @@ export default function MedicalHistory() {
       <header className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">Medical History</h1>
-        
         </div>
       </header>
 
@@ -64,7 +63,7 @@ export default function MedicalHistory() {
         <HeroSection user={user}/>
         <SearchAndFilters/>
         <QuickActions />
-        <CategorizedMedicalRecords />
+        <CategorizedMedicalRecords patientId={user?.id} />
         <EmergencyHealthSummary />
       </main>
     </div>

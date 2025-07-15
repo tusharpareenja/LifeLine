@@ -4,7 +4,7 @@ const {
     HarmBlockThreshold,
   } = require("@google/generative-ai");
   
-  const apiKey = process.env.GEMINI_API_KEY||'AIzaSyAtkHnYknmYNvBovIyjSklVO8U_YvBodWA';
+  const apiKey = process.env.GEMINI_API_KEY||'AIzaSyAUUEO-KyVKxa39yWG8rWDbyPHXcmhPHDc';
   const genAI = new GoogleGenerativeAI(apiKey);
   
   const model = genAI.getGenerativeModel({
@@ -70,6 +70,43 @@ export const subsidyChatSession = model.startChat({
       "application_link": "https://pmjay.gov.in"
     }
   ]
+}`},
+      ],
+    },
+  ],
+});
+
+// Function to get structured diagnosis, prescription, and lab reports from doctor's speech
+export const diagnosisChatSession = model.startChat({
+  generationConfig,
+  history: [
+    {
+      role: "user",
+      parts: [
+        {text: `You are an expert medical assistant. Given the following doctor's speech (converted to text), extract and organize the information into a structured format with the following rows:
+
+Diagnosis | Prescription | Lab Reports
+
+If any section is missing, leave it blank. Return the result as a JSON object with this structure:
+
+{
+  "diagnosis": "...",
+  "prescription": "...",
+  "lab_reports": "..."
+}
+
+Doctor's speech:
+"Patient presents with fever, cough, and body ache. Prescribe Paracetamol 500mg twice daily. Recommend CBC and Chest X-ray."
+`},
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {text: `{
+  "diagnosis": "Fever, cough, and body ache.",
+  "prescription": "Paracetamol 500mg twice daily.",
+  "lab_reports": "CBC, Chest X-ray."
 }`},
       ],
     },
