@@ -38,21 +38,12 @@ export default function DonationDashboard() {
   const [urgentAlerts, setUrgentAlerts] = useState([
     {
       id: "1",
-      hospitalName: "City General Hospital",
+      hospitalName: "Chakshit Hospital",
       bloodGroup: "O-",
       unitsNeeded: 8,
-      location: "Downtown Medical District",
-      distance: "2.3 km",
-      urgency: "critical",
-    },
-    {
-      id: "2",
-      hospitalName: "St. Mary's Medical Center",
-      bloodGroup: "AB+",
-      unitsNeeded: 3,
-      location: "Westside",
-      distance: "5.1 km",
-      urgency: "urgent",
+      location: "Mohali",
+      distance: "230 km",
+      urgency: "critical",  
     },
   ])
 
