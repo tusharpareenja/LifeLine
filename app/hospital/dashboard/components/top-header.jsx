@@ -18,17 +18,17 @@ export function TopHeader({ isDark, setIsDark, accent, setAccent }) {
         {/* Right side - Controls */}
         <div className="flex items-center gap-4">
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
+          {/* <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-teal-500 text-white text-xs">
               3
             </Badge>
-          </Button>
+          </Button> */}
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle
           <Button variant="ghost" size="icon" onClick={() => setIsDark(!isDark)}>
             {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+          </Button> */}
 
           {/* Help */}
           <Button variant="ghost" size="icon">
@@ -36,7 +36,7 @@ export function TopHeader({ isDark, setIsDark, accent, setAccent }) {
           </Button>
 
           {/* Accent Color Selector */}
-          <Select value={accent} onValueChange={(value) => setAccent(value)}>
+          {/* <Select value={accent} onValueChange={(value) => setAccent(value)}>
             <SelectTrigger className="w-[130px]">
               <SelectValue placeholder="Theme" />
             </SelectTrigger>
@@ -45,7 +45,7 @@ export function TopHeader({ isDark, setIsDark, accent, setAccent }) {
               <SelectItem value="violet">Violet</SelectItem>
               <SelectItem value="green">Green</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
 
           {/* User Profile */}
           <div className="flex items-center gap-3">
@@ -53,7 +53,7 @@ export function TopHeader({ isDark, setIsDark, accent, setAccent }) {
               <User className="h-4 w-4" />
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">Dr. Sarah Chen</p>
+              <p className="text-sm font-medium text-gray-900">Dr. Karan Nagpal</p>
             </div>
           </div>
 

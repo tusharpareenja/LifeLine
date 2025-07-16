@@ -14,7 +14,8 @@ import {
   Dna,
   Clock,
   CalendarClock,
-  Stethoscope
+  Stethoscope,
+  Droplet
 } from 'lucide-react';
 import { chatSession } from '@/config/AiModel';
 
@@ -100,10 +101,18 @@ const MedicalRecord = ({user}) => {
                   Personal Information
                 </h2>
                 <div className="space-y-3">
+          <p className="flex items-center text-gray-600">
+            <Users className="w-4 h-4 mr-2" />
+            Name: {user?.user?.name || user?.name || "N/A"}
+          </p>
                   <p className="flex items-center text-gray-600">
                     <Calendar className="w-4 h-4 mr-2" />
                     Date of Birth: {new Date(user.dob)?.toDateString()}
                   </p>
+          <p className="flex items-center text-gray-600">
+            <Droplet className="w-4 h-4 mr-2" />
+            Blood Group: {user?.bloodType || "N/A"}
+          </p>
                   <p className="flex items-center text-gray-600">
                     <Phone className="w-4 h-4 mr-2" />
                     Contact: {user?.phone ?? "null"}
@@ -114,7 +123,7 @@ const MedicalRecord = ({user}) => {
                   </p>
                   <p className="flex items-center text-gray-600">
                     <Home className="w-4 h-4 mr-2" />
-                    Address: 123 Medical Ave, Health City
+                    Address: Patna, Bihar
                   </p>
                 </div>
               </div>
@@ -184,8 +193,8 @@ const MedicalRecord = ({user}) => {
                         </h3>
                         <div className="space-y-4">
                           <div className="bg-white p-3 rounded-md shadow-sm">
-                            <h4 className="font-medium text-blue-700">Lisinopril 10mg</h4>
-                            <p className="text-sm text-gray-600">For Hypertension</p>
+                            <h4 className="font-medium text-blue-700">Aspirin</h4>
+                            <p className="text-sm text-gray-600">Anti-inflammatory</p>
                             <div className="mt-2 text-sm">
                               <p className="flex items-center">
                                 <Clock className="w-3 h-3 mr-1" />
@@ -195,7 +204,7 @@ const MedicalRecord = ({user}) => {
                             </div>
                           </div>
                           <div className="bg-white p-3 rounded-md shadow-sm">
-                            <h4 className="font-medium text-blue-700">Vitamin D3 2000 IU</h4>
+                            <h4 className="font-medium text-blue-700">Vitamin D</h4>
                             <p className="text-sm text-gray-600">Supplement</p>
                             <div className="mt-2 text-sm">
                               <p className="flex items-center">
@@ -215,23 +224,23 @@ const MedicalRecord = ({user}) => {
                         </h3>
                         <div className="space-y-4">
                           <div className="bg-white p-3 rounded-md shadow-sm">
-                            <h4 className="font-medium text-blue-700">Albuterol Inhaler</h4>
-                            <p className="text-sm text-gray-600">For Asthma Symptoms</p>
+                            <h4 className="font-medium text-blue-700">Amoxicillin</h4>
+                            <p className="text-sm text-gray-600">Broad-spectrum antibiotic</p>
                             <div className="mt-2 text-sm">
                               <p className="flex items-center">
                                 <Stethoscope className="w-3 h-3 mr-1" />
-                                2 puffs as needed
+                                
                               </p>
                               <p className="text-gray-500 mt-1">Max 4 times daily</p>
                             </div>
                           </div>
                           <div className="bg-white p-3 rounded-md shadow-sm">
-                            <h4 className="font-medium text-blue-700">Zyrtec 10mg</h4>
-                            <p className="text-sm text-gray-600">For Seasonal Allergies</p>
+                            <h4 className="font-medium text-blue-700">Paracetamol</h4>
+                            <p className="text-sm text-gray-600">Fever, mild pain relief</p>
                             <div className="mt-2 text-sm">
                               <p className="flex items-center">
                                 <Clock className="w-3 h-3 mr-1" />
-                                Once daily during allergy season
+                                Once daily during fever
                               </p>
                             </div>
                           </div>
