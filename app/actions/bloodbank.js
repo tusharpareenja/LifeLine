@@ -49,9 +49,19 @@ export async function updateBloodStock({ hospitalId, bloodType, quantity, thresh
   return updated
 }
 
-// Send notification to all patients of a given blood type (simulate message sending)
-export async function notifyDonors({ bloodType, hospitalId }) {
-  // Find all patients with the given blood type
+// Send notification to all patients of a given blood type and create a blood request
+export async function notifyDonors({ bloodType, hospitalId, quantity = 1 }) {
+  // Create a blood bank request in the database
+  const request = await prisma.bloodBankRequest.create({
+    data: {
+      hospitalId,
+      bloodType,
+      quantity,
+      status: "PENDING"
+    }
+  });
+
+  // Find all patients with the given blood type (for notification, optional)
   const patients = await prisma.patient.findMany({
     where: {
       bloodType,
@@ -60,15 +70,29 @@ export async function notifyDonors({ bloodType, hospitalId }) {
     include: {
       user: true,
     },
-  })
+  });
 
   // Simulate sending a message (replace with real SMS/email integration as needed)
   for (const patient of patients) {
     // Example: sendEmail(patient.user.email, ...)
     // Example: sendSMS(patient.phone, ...)
     // For now, just log
-    console.log(`Notify ${patient.user.email || patient.phone || patient.name} about urgent need for ${bloodType}`)
+    console.log(`Notify ${patient.user.email || patient.phone || patient.name} about urgent need for ${bloodType}`);
   }
 
-  return { count: patients.length }
+  return { request, notified: patients.length };
+}
+
+// Get all active blood requests (for users to see which blood groups are needed at which hospitals)
+export async function getActiveBloodRequests() {
+  const requests = await prisma.bloodBankRequest.findMany({
+    where: {
+      status: "PENDING"
+    },
+    include: {
+      hospital: true
+    },
+    orderBy: { createdAt: "desc" }
+  });
+  return requests;
 }

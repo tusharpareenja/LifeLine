@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Bell,
   Calendar,
@@ -34,8 +34,8 @@ export default function DonationDashboard() {
   const [locationEnabled, setLocationEnabled] = useState(true)
   const [showUrgentAlert, setShowUrgentAlert] = useState(true)
 
-  // Mock data
-  const [urgentAlerts] = useState([
+  // Mock data and live blood requests
+  const [urgentAlerts, setUrgentAlerts] = useState([
     {
       id: "1",
       hospitalName: "City General Hospital",
@@ -55,6 +55,32 @@ export default function DonationDashboard() {
       urgency: "urgent",
     },
   ])
+
+  // Fetch live blood requests from backend and prepend to urgentAlerts
+  useEffect(() => {
+    async function fetchBloodRequests() {
+      try {
+        const { getActiveBloodRequests } = await import("@/app/actions/bloodbank")
+        const requests = await getActiveBloodRequests()
+        if (Array.isArray(requests) && requests.length > 0) {
+          // Map backend fields to urgentAlerts format
+          const mapped = requests.map((req) => ({
+            id: req.id,
+            hospitalName: req.hospital?.name || "Hospital",
+            bloodGroup: req.bloodType?.replace("_POSITIVE", "+").replace("_NEGATIVE", "-") || "",
+            unitsNeeded: req.quantity,
+            location: req.hospital?.address || "-",
+            distance: req.hospital?.city ? req.hospital.city : "-",
+            urgency: "urgent",
+          }))
+          setUrgentAlerts((prev) => [...mapped, ...prev])
+        }
+      } catch (e) {
+        // ignore error, keep mock data
+      }
+    }
+    fetchBloodRequests()
+  }, [])
 
   const [upcomingEvents] = useState([
     {
@@ -208,7 +234,8 @@ export default function DonationDashboard() {
                     <div>
                       <CardTitle className="text-red-900 flex items-center gap-2">
                         <Droplets className="w-5 h-5" />
-                        {alert.bloodGroup} Blood Needed
+                        <Badge variant="destructive" className="text-base px-2 py-1">{alert.bloodGroup}</Badge>
+                        <span>Blood Needed</span>
                       </CardTitle>
                       <p className="text-red-700 font-medium">{alert.hospitalName}</p>
                     </div>

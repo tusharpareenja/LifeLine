@@ -131,7 +131,6 @@ model Hospital {
   icuBeds         Int       @default(0) @map("icu_beds")
   ventilators     Int       @default(0)
   createdAt       DateTime  @default(now()) @map("created_at")
-  
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -143,6 +142,7 @@ model Hospital {
   beds            Bed[]
 
   bloodBankStocks BloodBankStock[]
+  bloodBankRequests BloodBankRequest[]
   feedbacks Feedback[] @relation("HospitalFeedback")
 
   @@map("hospitals")
@@ -250,6 +250,7 @@ model Bed {
   @@map("beds")
 }
 
+
 // 11. Blood Bank Stock Model
 model BloodBankStock {
   id           String     @id @default(uuid())
@@ -262,9 +263,26 @@ model BloodBankStock {
 
   // Relations
   hospital     Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  requests     BloodBankRequest[]
 
   @@unique([hospitalId, bloodType])
   @@map("blood_bank_stock")
+}
+
+// Blood Bank Request Model
+model BloodBankRequest {
+  id           String     @id @default(uuid())
+  hospitalId   String
+  bloodType    BloodType
+  quantity     Int        @default(1)
+  status       RequestStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+
+  // Relations
+  hospital     Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  stock        BloodBankStock? @relation(fields: [hospitalId, bloodType], references: [hospitalId, bloodType], onDelete: Cascade)
+
+  @@map("blood_bank_request")
 }
 
 /// Feedback for appointments, doctors, hospitals, and services

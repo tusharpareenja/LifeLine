@@ -39,9 +39,15 @@ const addBloodStock = async ({ hospitalId, bloodType, quantity, threshold }) => 
   return addBloodStock({ hospitalId, bloodType, quantity, threshold })
 }
 
+
 const notifyDonors = async ({ bloodType, hospitalId }) => {
   const { notifyDonors } = await import("@/app/actions/bloodbank")
-  return notifyDonors({ bloodType, hospitalId })
+  // Always send enum value to backend
+  let enumType = bloodType
+  if (BLOOD_TYPE_MAP[bloodType]) {
+    enumType = BLOOD_TYPE_MAP[bloodType]
+  }
+  return notifyDonors({ bloodType: enumType, hospitalId })
 }
 
 
@@ -93,13 +99,15 @@ export default function BloodBankPage() {
 
   const handleNotifyDonors = async (bloodType) => {
     try {
-      // Show alert before notifying
-      window.alert(`Donor notification sent for ${bloodType}.`)
-      await notifyDonors({ bloodType, hospitalId })
-      toast({
-        title: "Donors Notified",
-        description: `All nearby ${bloodType} donors have been notified about the urgent need.`,
-      })
+      const result = await notifyDonors({ bloodType, hospitalId })
+      if (result?.request) {
+        toast({
+          title: "Blood Request Created",
+          description: `Request for ${bloodType} at this hospital is now visible to all users. Notified ${result.notified} patients.`,
+        })
+      } else {
+        toast({ title: "Error", description: "Failed to create blood request." })
+      }
     } catch (e) {
       toast({ title: "Error", description: "Failed to notify donors." })
     }
