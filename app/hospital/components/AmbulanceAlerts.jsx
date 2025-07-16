@@ -1,21 +1,21 @@
 "use client";
-import { useSocket } from "../../lib/socket";
+import { getSocket } from "@/lib/socket";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
 export default function AmbulanceAlerts() {
-  const socket = useSocket("hospital");
+  const socket = getSocket("hospital");
   const { data: session } = useSession();
   const [requests, setRequests] = useState([]);
 
-  useEffect(() => {
-    if (!socket) return;
-    const handler = (data) => {
-      setRequests((prev) => [...prev, data]);
-    };
-    socket.on("AMBULANCE_ALERT", handler);
-    return () => socket.off("AMBULANCE_ALERT", handler);
-  }, [socket]);
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   const handler = (data) => {
+  //     setRequests((prev) => [...prev, data]);
+  //   };
+  //   socket.on("AMBULANCE_ALERT", handler);
+  //   return () => socket.off("AMBULANCE_ALERT", handler);
+  // }, [socket]);
 
   const sendAmbulance = (patientId) => {
     if (socket && session?.user?.id && patientId) {

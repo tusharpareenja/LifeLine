@@ -316,3 +316,80 @@ export async function getAppointmentsByPatientId(patientId, { onlyUpcoming = fal
     return { success: false, error: "Failed to fetch appointments by patientId" };
   }
 }
+
+// Add or update medical report for an appointment
+export async function upsertMedicalReport({ patientId, doctorId, diagnosis, prescription }) {
+  try {
+    // Check if a report already exists for this patient and doctor on today's date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const existingReport = await db.medicalReport.findFirst({
+      where: {
+        patientId,
+        doctorId,
+        date: {
+          gte: today,
+          lt: tomorrow
+        }
+      }
+    });
+
+    let report;
+    if (existingReport) {
+      // Update existing report
+      report = await db.medicalReport.update({
+        where: { id: existingReport.id },
+        data: { diagnosis, prescription, date: new Date() }
+      });
+    } else {
+      // Create new report
+      report = await db.medicalReport.create({
+        data: {
+          patient: { connect: { id: patientId } },
+          doctor: { connect: { id: doctorId } },
+          diagnosis,
+          prescription,
+          date: new Date()
+        }
+      });
+    }
+    return { success: true, data: report };
+  } catch (error) {
+    console.error("Failed to upsert medical report:", error);
+    return { success: false, error: "Failed to upsert medical report" };
+  }
+}
+
+// Get all medical reports for a patient (past consultations)
+export async function getMedicalReportsByPatientId(patientId) {
+  try {
+    if (!patientId) {
+      return { success: false, error: "No patientId provided" };
+    }
+    const reports = await db.medicalReport.findMany({
+      where: { patientId },
+      include: {
+        doctor: {
+          include: {
+            user: { select: { name: true, email: true } }
+          }
+        }
+      },
+      orderBy: { date: "desc" }
+    });
+    // Debug log before returning
+    console.log("Fetched medical reports:", JSON.stringify(reports, null, 2));
+    // Ensure returned data is serializable
+    const serializableReports = reports.map(r => ({
+      ...r,
+      date: r.date instanceof Date ? r.date.toISOString() : r.date
+    }));
+    return { success: true, data: serializableReports };
+  } catch (error) {
+    console.error("Failed to fetch medical reports by patientId:", error);
+    return { success: false, error: "Failed to fetch medical reports by patientId" };
+  }
+}

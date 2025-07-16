@@ -1,3 +1,5 @@
+// Medical Reports Model
+
 // This is your Prisma schema file
 
 generator client {
@@ -53,6 +55,7 @@ model Patient {
   hospital        Hospital?  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
   doctors         Doctor[]
   medicalRecords  MedicalRecord[]
+  medicalReports  MedicalReport[]
   familyHistory   FamilyHistory[]
   appointments    Appointment[]
   emergencyRequests EmergencyRequest[]
@@ -73,6 +76,20 @@ model Patient {
   @@map("patients")
 }
 
+model MedicalReport {
+  id           String    @id @default(uuid())
+  patientId    String
+  doctorId     String
+  prescription String
+  diagnosis    String
+  date         DateTime @default(now())
+
+  // Relations
+  patient      Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor       Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("medical_reports")
+}
 // 3. Doctors Model
 model Doctor {
   id              String    @id @default(uuid())
@@ -90,6 +107,7 @@ model Doctor {
   hospital        Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
   patients        Patient[] 
   medicalRecords  MedicalRecord[]
+  medicalReports  MedicalReport[]
   appointments    Appointment[]
   prescriptions   Prescription[]
   feedbacks Feedback[] @relation("DoctorFeedback")

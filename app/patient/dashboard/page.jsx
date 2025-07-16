@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {Calendar} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,9 @@ import {  Droplet, User } from 'lucide-react'
 import { getPatientById } from '../../actions/patients.js';
 import { getDoctors } from "@/app/actions/doctors"
 import { getNearbyHospitals } from "@/app/actions/hospitals"
-import RequestAmbulanceButton from '@/app/patient/components/RequestAmbulanceButton';
+import { getSocket } from '@/lib/socket';
+import { useSession } from 'next-auth/react';
+import { getBestHospitalId } from '@/lib/utils.js';
 
 const upcomingAppointments = [
   { id: 1, doctor: 'Dr. Souravv', date: '2025-02-15', time: '10:00 AM' },
@@ -122,30 +124,103 @@ const HospitalBedAvailability = ({ hospitals = [] }) => (
   </Card>
 );
 
-const EmergencyServices = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Emergency Services</CardTitle>
-    </CardHeader>
-    <CardContent className="flex flex-col space-y-2">
-      <Button
-        variant="destructive"
-        onClick={() => window.location.href = "tel:112"}
-      >
-        112 Emergency
-      </Button>
+function EmergencyServicesWithSOS({ userLocation }) {
+  const [showSOS, setShowSOS] = useState(false);
+  const [timer, setTimer] = useState(5);
+  const [bestHospitalId, setHospitalId] = useState("1"); // Default fallback
+  const hospitalId = sessionStorage.getItem("hospitalId");
+  const socket = getSocket("patient");
+  const patientId = sessionStorage.getItem("patientId");
 
-      <RequestAmbulanceButton />
-      {/* <AmbulanceAlerts /> */}
+  console.log("userLocation", userLocation);
 
-      <Button
-        onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
-      >
-        Find Blood Banks
-      </Button>
-    </CardContent>
-  </Card>
-);
+  useEffect(() => {
+    const fetchBestHospital = async () => {
+      if (userLocation?.latitude && userLocation?.longitude) {
+        const bestHospitalId = await getBestHospitalId(
+          userLocation.latitude,
+          userLocation.longitude
+        );
+        console.log("bestHospitalId", bestHospitalId);
+        if (bestHospitalId) {
+          setHospitalId(bestHospitalId);
+        }
+      }
+    };
+  
+    fetchBestHospital();
+  }, [userLocation]);
+  
+
+  useEffect(() => {
+    let interval;
+    if (showSOS && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    if (timer === 0 && showSOS) {
+      // Trigger SOS call after 5 seconds
+      socket.emit("AMBULANCE_REQUEST", {
+        patientId,
+        hospitalId : bestHospitalId,
+        timestamp: Date.now(),
+      });
+      console.log("Ambulance request sent");
+      setShowSOS(false);
+      setTimer(5);
+    }
+    return () => clearInterval(interval);
+  }, [showSOS, timer, hospitalId, patientId, socket]);
+
+  const handleEmergencyClick = () => {
+    setShowSOS(true);
+    setTimer(5);
+  };
+
+  const handleCancel = () => {
+    setShowSOS(false);
+    setTimer(5);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Emergency Services</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col space-y-2">
+        <Button
+          variant="destructive"
+          onClick={handleEmergencyClick}
+        >
+          SOS Emergency
+        </Button>
+        <Button
+          onClick={() => window.open("https://medulance.com/", "_blank")}
+        >
+          Book Ambulance
+        </Button>
+        <Button
+          onClick={() => window.open("https://www.google.com/maps/search/blood+banks+near+me", "_blank")}
+        >
+          Find Blood Banks
+        </Button>
+      </CardContent>
+      {showSOS && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 w-full max-w-sm mx-4 flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">SOS Call Initiating...</h2>
+            <div className="text-5xl font-bold text-gray-800 mb-4">{timer}</div>
+            <Button variant="outline" onClick={handleCancel} className="mt-2">Cancel</Button>
+            <p className="mt-4 text-gray-500 text-center">Calling emergency number 112 in {timer} seconds...</p>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+const EmergencyServices = ({ userLocation }) => <EmergencyServicesWithSOS userLocation={userLocation} />;
 
 const DoctorRecommendations = ({ doctors = [] }) => (
   <Card>
@@ -364,6 +439,8 @@ const Dashboard = () => {
   const [nearbyHospitals, setNearbyHospitals] = useState([]);
   const [locationPrompted, setLocationPrompted] = useState(false);
 
+  console.log("userLocation", userLocation);
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -459,7 +536,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <UpcomingAppointments appointments={upcomingAppointments} />
               <HospitalBedAvailability hospitals={hospitals} />
-              <EmergencyServices />
+              <EmergencyServices userLocation={userLocation} />
               <DoctorRecommendations doctors={doctorList} />
               <RecentMedicalReports reports={medicalRecords} />
             </div>

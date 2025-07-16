@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster toastOptions={{ className: "sonner"}} position="top-right" duration={5000}/>
+        <Toaster toastOptions={{ className: "sonner"}} position="top-right" duration={12000}/>
         <SessionProvider>
         <div className=" bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 ">
         

@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Search, Upload, Download, Share2, Moon, Sun, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { getMedicalReportsByPatientId } from "@/app/actions/appointments"
 
-export default function CategorizedMedicalRecords() {
+export default function CategorizedMedicalRecords({ patientId }) {
     return (
       <Tabs defaultValue="consultations" className="mb-8">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-4">
@@ -22,7 +23,7 @@ export default function CategorizedMedicalRecords() {
           <TabsTrigger value="surgeries">Surgeries</TabsTrigger>
         </TabsList>
         <TabsContent value="consultations">
-          <ConsultationHistory />
+          <ConsultationHistory patientId={patientId} />
         </TabsContent>
         <TabsContent value="lab-reports">
           <LabReports />
@@ -40,42 +41,65 @@ export default function CategorizedMedicalRecords() {
     )
   }
 
-  function ConsultationHistory() {
-    const consultations = [
-      {
-        id: 1,
-        date: "May 15, 2025",
-        doctor: "Dr. Emily Chen",
-        reason: "Annual Checkup",
-        prescription: "Vitamin D supplements",
-      },
-      {
-        id: 2,
-        date: "March 3, 2025",
-        doctor: "Dr. Michael Lee",
-        reason: "Flu Symptoms",
-        prescription: "Antiviral medication",
-      },
-    ]
-  
+  function ConsultationHistory({ patientId }) {
+    const [consultations, setConsultations] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
+
+    useEffect(() => {
+      async function fetchReports() {
+        setLoading(true)
+        setError("")
+        if (!patientId) {
+          setError("No patient ID provided.")
+          setConsultations([])
+          setLoading(false)
+          return
+        }
+        try {
+          const res = await getMedicalReportsByPatientId(patientId)
+          console.log("Fetched consultations response:", res)
+          if (res && res.success) {
+            setConsultations(Array.isArray(res.data) ? res.data : [])
+            console.log("Consultations data:", res.data)
+          } else {
+            setError(res?.error || "Failed to fetch medical reports")
+            setConsultations([])
+          }
+        } catch (err) {
+          setError("Failed to fetch medical reports: " + (err?.message || err))
+          setConsultations([])
+        }
+        setLoading(false)
+      }
+      fetchReports()
+    }, [patientId])
+
+    if (loading) return <div className="text-center py-4 text-gray-500">Loading...</div>
+    if (error) return <div className="text-center py-4 text-red-500">{error}</div>
+
     return (
       <ScrollArea className="h-[400px]">
         <div className="space-y-4">
-          {consultations.map((consultation) => (
-            <Card key={consultation.id}>
-              <CardHeader>
-                <CardTitle>
-                  {consultation.date} - {consultation.doctor}
-                </CardTitle>
-                <CardDescription>{consultation.reason}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  <strong>Prescription:</strong> {consultation.prescription}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {consultations.length === 0 ? (
+            <div className="text-center py-4 text-gray-500">No consultations found.</div>
+          ) : (
+            consultations.map((consultation) => (
+              <Card key={consultation.id}>
+                <CardHeader>
+                  <CardTitle>
+                    {new Date(consultation.date).toLocaleDateString()} - {consultation.doctor?.user?.name || "Unknown Doctor"}
+                  </CardTitle>
+                  <CardDescription>{consultation.diagnosis}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    <strong>Prescription:</strong> {consultation.prescription}
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </ScrollArea>
     )
